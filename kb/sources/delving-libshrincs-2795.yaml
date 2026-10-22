@@ -1,0 +1,10 @@
+id: delving-libshrincs-2795
+title: 'Libshrincs: A C implementation with a machine-checked security proof'
+authors:
+- Jonas Nick
+venue: Delving Bitcoin
+date: 2026-08-11
+url: https://delvingbitcoin.org/t/2795
+type: mailing-list
+trust: primary
+notes: Skimmed only; not used for requirements.

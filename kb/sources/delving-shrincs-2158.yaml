@@ -1,0 +1,17 @@
+id: delving-shrincs-2158
+title: 'SHRINCS: 324-byte stateful post-quantum signatures with static backups'
+authors:
+- Jonas Nick
+- conduition
+- moonsettler
+- Greg Maxwell
+- Ethan Heilman
+- Mikhail Kudinov
+- Oleksandr Kurbatov
+venue: Delving Bitcoin
+date: 2025-12-11
+url: https://delvingbitcoin.org/t/shrincs-324-byte-stateful-post-quantum-signatures-with-static-backups/2158
+type: mailing-list
+trust: primary
+notes: 'Forum thread, 22 posts through 2026-07-01. Post #20 (olkurbatov) holds the
+  SHRINCS-L Liquid benchmark.'

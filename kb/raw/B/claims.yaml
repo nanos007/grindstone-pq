@@ -1,0 +1,200 @@
+# Agent B ("Parameter Cartographer") extracted claims. Retrieved 2026-10-22.
+# confidence: H = read verbatim from primary source AND reproduced by grindstone/ref/costs.py;
+#             M = read from primary source, not independently reproduced (or reproduced with caveat);
+#             L = inferred / interpretation.
+# Sources:
+#   KN   = Kudinov & Nick, "Hash-based Signature Schemes for Bitcoin", IACR ePrint 2025/2203,
+#          PDF dated 2025-12-05 (received) / 2025-12-08 (approved), https://eprint.iacr.org/2025/2203.pdf
+#   REPO = github.com/BlockstreamResearch/SPHINCS-Parameters @ ceee8ed67e8b69ae2d8efd10065b5a550c330018
+#          (commit date 2026-08-26, "repo: refactor"; HEAD of default branch on 2026-10-22)
+#   FD   = Fluhrer & Dang, "Smaller Sphincs+", IACR ePrint 2024/018, https://eprint.iacr.org/2024/018.pdf
+
+- id: B-001
+  statement: "Repo HEAD of BlockstreamResearch/SPHINCS-Parameters on 2026-10-22 is ceee8ed (same as the commit cited in project plan 3.5)."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/commit/ceee8ed67e8b69ae2d8efd10065b5a550c330018
+  exact_location: "git log -1 after clone"
+  date: 2026-08-26
+  value: {commit: ceee8ed67e8b69ae2d8efd10065b5a550c330018}
+  confidence: H
+
+- id: B-002
+  statement: "Headline 2^40 point: W+C P+FP, h=40 d=5 a=14 k=11 w=256 S=2040, 4036 bytes (bold row)."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "Sec. 13, Table 1 (2^40 block, W+C P+FP, bold row); p.37"
+  date: 2025-12-08
+  value: {sig_bytes: 4036, sig_limit_log2: 40, m_max: 118, exp_search_hashes: "23e4", wc_search_hashes: "462e4", verify_compr: 10559}
+  reproduced: {sig_bytes: 4036, m_max: 118, exp_search_hashes: 225017, wc_search_hashes: 4624791, verify_compr_uncached: 10559, profile: "R=32B, uncached"}
+  confidence: H
+
+- id: B-003
+  statement: "Headline 2^30 point: W+C P+FP, h=32 d=4 a=14 k=10 w=256 S=2040, 3440 bytes (bold row)."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "Sec. 13, Table 1 (2^30 block, W+C P+FP, bold row)"
+  date: 2025-12-08
+  value: {sig_bytes: 3440, sig_limit_log2: 30, m_max: 106, exp_search_hashes: "20e4", wc_search_hashes: "411e4", verify_compr: 8472}
+  reproduced: {sig_bytes: 3440, m_max: 106, exp_search_hashes: 199470, wc_search_hashes: 4107396}
+  confidence: H
+
+- id: B-004
+  statement: "The ~3128 B @2^20 figure is Table 2's W+C P+FP row h=24 d=2 a=16 k=8 w=16 S=240 (not bold). Table 2 also lists a SMALLER 2^20 row: W+C P+FP h=20 d=2 a=15 k=10 w=256 S=2040 at 2856 B."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "Sec. 13, Table 2 (2^20)"
+  date: 2025-12-08
+  value: {row_3128: {h: 24, d: 2, a: 16, k: 8, w: 16, S: 240, m_max: 97, sig_bytes: 3128}, row_2856: {h: 20, d: 2, a: 15, k: 10, w: 256, S: 2040, m_max: 114, sig_bytes: 2856}}
+  confidence: H
+  note: "Project plan 1.1 quotes 3,128 B for 2^20; the paper's smallest 2^20 point is 2,856 B (heavier verify: 4372 compr, 1.53 compr/B)."
+
+- id: B-005
+  statement: "All sizes in KN Tables 1-2 use 32-byte randomness R; repo HEAD uses R = 16 bytes, so every repo size is exactly 16 B smaller (4036->4020, 3440->3424, 3128->3112)."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: "costs.sage:40 randomness_size = 16; KN Sec. 13 'PRF_msg output to be 256 bits'; tests/fixtures.json variants (W+C_P+FP|40,5,11,14,256,2040 size 4020)"
+  date: 2026-08-26
+  value: {paper_R_bytes: 32, repo_R_bytes: 16, delta_bytes: 16}
+  confidence: H
+
+- id: B-006
+  statement: "KN Tables 1-2 compression counts use the original 'uncached' convention (Th2 = 2 compressions); repo HEAD defaults to 'cached' (PK.seed midstate, Th2 = 1, ADRS_c 22 B). Hash-call counts and grind counts are convention-independent."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: "costs.sage:42-74; KN Table 1 SPX row verify 2387 compr (uncached) vs repo fixtures baseline sv 2155 (cached)"
+  date: 2026-08-26
+  confidence: H
+
+- id: B-007
+  statement: "All 29 W+C / W+C F+C / W+C P+FP rows + SPX row of KN Tables 1-2 reproduce exactly in size, verify hashes, verify compressions, expected search and 2^-30 worst-case search (paper rounding) with costs.py under (R=32, uncached)."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "Tables 1-2; grindstone/tests/test_costs.py::test_paper_tables_full_row"
+  date: 2026-10-22
+  confidence: H
+
+- id: B-008
+  statement: "WOTS+C success probability p = nu / w^len1 (times 2^-z_b), nu = sum_j (-1)^j C(l,j) C(S+l-jw-1, l-1); expected tries 1/p per layer; tail P(T>k) = (1-p)^k."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "Sec. 5.1, eq. (1); costs.sage:184-205, 409-411"
+  date: 2025-12-08
+  confidence: H
+
+- id: B-009
+  statement: "WOTS+C expected tries per layer: w=16,len1=32: S=240 -> 65.7, S=304 -> 1335; w=256,len1=16: S=2040 -> 748, S=2840 -> 30143."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: "costs.sage:409-410 (formula); values computed by grindstone/ref/costs.py wots_c_expected_tries; consistent with KN Table 1 Exp. Search (e.g. 264 = 4*ceil(65.7), 3745 = 5*ceil(748.x), 15e4 = 5*30144)"
+  date: 2026-10-22
+  value: {w16_S240: 65.7, w16_S304: 1335, w256_S2040: 748, w256_S2840: 30143}
+  confidence: H
+
+- id: B-010
+  statement: "WOTS+C zero-chains: the last z chains are omitted (l = len1 - z) if their digits are 0; the paper writes the index range as [w-1-z+1, w-1], which looks like a typo for [len1-z+1, len1]. The repo never uses z (z = 0 everywhere)."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "Sec. 5, condition 2 and Verify step 5"
+  date: 2025-12-08
+  confidence: M
+  note: "GRINDSTONE models p(z) = nu(len1-z, S, w)/w^len1 (brute-force checked in tests). Paper's p_nu = nu/(w^l 2^z_b) is ambiguous on whether w^l uses l=len1-z; we use len1."
+
+- id: B-011
+  statement: "FORS+C: last tree forced to open leaf 0 (last a digest bits zero); expected 2^a attempts; costs.sage charges C_Hmsg + C_PRFmsg = 4 compressions (2 'hashes') per attempt and models R-regeneration (counter in PRF_msg)."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: "costs.sage:435-456, 61-62; KN Sec. 9.2"
+  date: 2026-08-26
+  confidence: H
+
+- id: B-012
+  statement: "PORS+FP m_max is not a free parameter in the repo: compute_mmax picks the smallest m_max (starting at (k-1)a - 22) whose expected signing compressions are < 1.11x the FORS+C signing time for the same (h,d,k,a,w)."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: "costs.sage:331-358"
+  date: 2026-08-26
+  confidence: H
+
+- id: B-013
+  statement: "PORS+FP expected tries = 1 / P(|Octopus set| <= m_max) from the exact Abri-Katz PMF; the repo ceil()s the attempt count; the 2^-30 worst case is worst_case(1/ceil(E), 2^-30, 1); the paper assumes one hash suffices to obtain k distinct indices (Sec. 13)."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/octopus_pmf.py
+  exact_location: "octopus_pmf.py:261-328; costs.sage:227-248, 466-469; KN Sec. 13 'we assume that a single hash function invocation is sufficient'"
+  date: 2026-08-26
+  confidence: H
+
+- id: B-014
+  statement: "The analytic worst case is a combined count: worst_case(p_wots, 2^-30, d) [negative-binomial over all d layers] + worst_case(p_fts, 2^-30, 1) * 2 hashes; i.e. each component at 2^-30, summed (not a joint 2^-30 bound)."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: "costs.sage:254-289, 411, 447, 454, 469, 474"
+  date: 2026-08-26
+  confidence: H
+
+- id: B-015
+  statement: "Security model: sigma = sum_r Bin(q_s, 2^-h)[r] * P_forge(r); FORS P=(1-(1-1/t)^r)^k; PORS+FP P=C(min(rk,t),k)/C(t,k); bits = -log2 max(2^-128, sigma). Port reproduces the repo's 6,479 passing (h,d,k,a) on the canonical 2^40 grid and the W+C/F+C/P+FP pool counts 6666/7077/7746."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/security.sage
+  exact_location: "security.sage:82-152; tests/fixtures.json variant_pool_counts and _comment_w_grid_2026_08_21"
+  date: 2026-08-26
+  confidence: H
+
+- id: B-016
+  statement: "Plain W+C S=2840 (w=256) halves-to-thirds verification (10635 -> 6635 compr @2^40) at ~40x more WOTS+C grinding (3745 -> 15e4 hashes); S is a verify-cost lever, not a size lever."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "Table 1 2^40 W+C rows 40/5/14/11/256 S=2040 vs S=2840"
+  date: 2025-12-08
+  confidence: H
+
+- id: B-017
+  statement: "KN target: at most 2.6 verification compressions per signature byte; the 2^40 P+FP bold row is at 2.62 (the one stated exception)."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "Sec. 13, paragraph before Table 1 ('we want at most 2.6 invocations per byte ... except one with ratio 2.61')"
+  date: 2025-12-08
+  confidence: M
+  note: "Text says 2.61, table prints 2.62 (10559/4036 = 2.616). Minor internal inconsistency (rounding)."
+
+- id: B-018
+  statement: "FD (plain SPHINCS+, no grinding) Level-1 2^20 sets: C-1 (h24 d3 a16 k8 w256) 3440 B / 5,113,336 sign hashes / 7077 verify; D-1 (h24 d2 a21 k6 w256) 3088 B / 75.5M; AAA-1 (h30 d2 a24 k5 w256) 3072 B / 554M; AAA-2 = SPHINCS+-128s-q20 (h18 d1 a24 k6 w16) 3264 B."
+  source_url: https://eprint.iacr.org/2024/018.pdf
+  exact_location: "Sec. 9.1, Tables 4 (C), 5 (D), 6 (AAA)"
+  date: 2024-01 (ePrint 2024/018; revision date not verified)
+  confidence: M
+  reproduced: {C-1: {size: 3440, sign_hashes: 5113336, verify_hashes: 7050}, D-1: {size: 3088, sign_hashes: 75513851, verify_hashes: 4750}, AAA-1: {size: 3072, sign_hashes: 553779196, verify_hashes: 4749}, AAA-2: {size: 3264, sign_hashes: 449314812, verify_hashes: 433}}
+  note: "Sizes agree exactly (with R = n = 16 B). Sign hashes agree to within 5 hashes; verify hashes differ by +18..+27 (FD counts expected chain walk/checksum differently). All four pass >= 128 bits under the Blockstream security model at 2^20."
+
+- id: B-019
+  statement: "FD select by 'tuned' security (attack probability ~2^-n at the limit) plus a retained-security overuse metric (sigs at level 112) and signing-hash budgets 1e5..6e8; KN select by >= 128-bit security at the limit, size, and a compressions/byte verification cap. FD has no grinding (WOTS+C/FORS+C/PORS+FP)."
+  source_url: https://eprint.iacr.org/2024/018.pdf
+  exact_location: "Sec. 6 'Tuning Sphincs+', Sec. 9 selection-set definition"
+  date: 2024-01
+  confidence: M
+
+- id: B-020
+  statement: "With grinding the KN 2^20 P+FP point (3128 B @ ~6.0e6 sign hashes) is 312 B smaller than FD C-1 (3440 B @ 5.1e6 hashes) at similar signing cost; FD's D-1/AAA-1 (3088/3072 B) need 75M-554M hashes, which grinding variants beat at ~1e7 (2856 B, KN Table 2)."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "KN Table 2 vs FD Tables 4-6"
+  date: 2026-10-22
+  confidence: M
+
+# ---- Derived findings from the GRINDSTONE enumeration (kb/params/*) ----
+- id: B-021
+  statement: "The repo m_max rule (PORS+FP within 1.11x FORS+C signing time) chooses ~2^16.3-2^18 PORS+FP tries. Hardware-wallet-safe points (every grind <= 2^12 tries, 2^-30 worst <= 2^20 hashes, sign <= 2^23 compr.) reach 2876 B @2^20, 3456 B @2^30, 3944 B @2^40 (R=16), vs repo-profile refs 3112/3424/4020."
+  source_url: file://grindstone/kb/params/shortlist_draft.yaml
+  exact_location: "profile hw_wallet_safe; generated by kb/params/build_shortlist.py from params_candidates.parquet"
+  date: 2026-10-22
+  confidence: M
+  note: "Model-derived (costs.py), not measured. Same cost model as the paper."
+
+- id: B-022
+  statement: "WOTS+C z=1 at w=256 (S = mean of 15 chains = 1912) costs ~2^17.5 expected tries per layer and saves 16 B per layer; it is the dominant lever in every GPU-signer point. Not modelled in the repo (z=0 everywhere); its security impact is not analysed there."
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: "Sec. 5 (zero-chains); grindstone/ref/costs.py wots_c_success_prob"
+  date: 2026-10-22
+  confidence: M
+
+- id: B-023
+  statement: "GPU-signer size floor under <=2^24 tries/instance and <=2^30 sign compressions: 2280 B @2^20, 2664 B @2^30, 2892 B @2^40 (R=16); these are tree-build bound (d=2-3, h'=16, ~5-8e8 compressions), grinding <= ~2^25.5 compressions."
+  source_url: file://grindstone/kb/params/shortlist_draft.yaml
+  exact_location: "profile gpu_signer_max"
+  date: 2026-10-22
+  confidence: M
+
+- id: B-024
+  statement: "Open decision: R size. Paper tables use R=32 B, repo HEAD and FIPS 205 use R=n=16 B; all GRINDSTONE parquet/shortlist sizes are R=16 with a sig_bytes_paper_r32 column (+16)."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: "costs.sage:40"
+  date: 2026-10-22
+  confidence: H
+
+- id: B-025
+  statement: "WC Search (2^-30) in the paper/repo is a sum of per-component 2^-30 bounds (WOTS+C negative-binomial over d layers + FTS geometric), not a joint 2^-30 bound; empirical tails should be compared per component."
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: "costs.sage:454, 474"
+  date: 2026-08-26
+  confidence: H

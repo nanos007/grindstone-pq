@@ -1,0 +1,263 @@
+# Agent C (Mailing-List Ethnographer) atomic claims, compiled 2026-10-22. Schema per plan section 3.3.
+# Source ids refer to kb/raw/C/sources.yaml. Values are copied as stated by the source; "derived" tags mark our arithmetic.
+# Conflicts are recorded in `notes`, not resolved.
+claims:
+  # ---------- Timeline / standards status ----------
+  - id: C-C001
+    statement: "BIP-360 (Pay-to-Merkle-Root, P2MR) was merged into the bitcoin/bips repository on 2026-02-11."
+    source: bip-0360
+    location: "bitcoin/bips commit eae7d9fc57 'BIP360: Pay to Merkle Root (P2MR) (#1670)', committer date 2026-02-11T21:01:47Z"
+    value: {merge_date: 2026-02-11, commit: eae7d9fc57, pr: 1670}
+    confidence: H
+    verified_by_us: false
+    tags: [timeline, bip360]
+  - id: C-C002
+    statement: "BIP-360 was renamed from Pay-to-Tapscript-Hash (P2TSH) to Pay-to-Merkle-Root (P2MR) in version 0.11.0 (2026-02-10). At fetch time (2026-10-22) it is Status: Draft, Version 0.12.1."
+    source: bip-0360
+    location: "Header preamble; Changelog entries 0.11.0 and 0.12.1"
+    value: {rename_version: "0.11.0", rename_date: 2026-02-10, status: Draft, version: "0.12.1"}
+    confidence: H
+    verified_by_us: false
+    tags: [timeline, bip360]
+    notes: "The plan calls it 'formerly P2QRH'. The changelog records the last rename as P2TSH→P2MR. The Delving thread 1811 shows P2QRH was the earlier name, so the naming went P2QRH → P2TSH → P2MR."
+  - id: C-C003
+    statement: "BIP-360 does not specify post-quantum signatures; its authors 'intend to offer a separate proposal for this purpose upon further research.'"
+    source: bip-0360
+    location: "Abstract/Motivation paragraph (line ~29 of bip-0360.mediawiki)"
+    value: {pq_signature_in_bip360: false}
+    confidence: H
+    verified_by_us: false
+    tags: [timeline, bip360, scope]
+  - id: C-C004
+    statement: "A P2MR depth-1 witness (Schnorr leaf) is 135 bytes, 69 bytes larger than a P2TR key-path witness (66 B), and 32 bytes smaller than an equivalent P2TR script-path witness (34 bytes at m = 7)."
+    source: bip-0360
+    location: "Section on witness size comparison (P2MR witness for a depth-1 tree; general case 103 + 32*m bytes)"
+    value: {p2mr_depth1_witness_bytes: 135, p2tr_keypath_witness_bytes: 66, delta_vs_keypath: 69, delta_vs_p2tr_scriptpath: -32}
+    confidence: H
+    verified_by_us: false
+    tags: [vbytes, bip360, fees]
+  - id: C-C005
+    statement: "The SHRINCS draft BIP was announced on bitcoindev on 2026-08-26 by conduition for the SHRINCS Working Group. As of 2026-09-19 it had not been opened as a PR to bitcoin/bips. Murch (BIP editor) invited a PR on 2026-09-11."
+    source: ml-shrincs-draft-2026
+    location: "Root message 2026-08-26 21:17 UTC; Murch 2026-09-11; conduition 2026-09-19"
+    value: {announced: 2026-08-26, bips_pr_opened_as_of_2026_09_19: false}
+    confidence: H
+    verified_by_us: false
+    tags: [timeline, shrincs]
+    notes: "PR status after 2026-09-19 was not checked."
+  - id: C-C006
+    statement: "The SHRINCS draft states: stateless signatures are 5777 bytes, stateful signatures are 548 bytes at minimum, and public keys are 48 bytes."
+    source: ml-shrincs-draft-2026
+    location: "Root message, 'Features' list"
+    value: {pk_bytes: 48, stateful_sig_min_bytes: 548, stateless_sig_bytes: 5777}
+    confidence: H
+    verified_by_us: false
+    tags: [shrincs, size]
+    notes: "Conflicts with the original Delving SHRINCS post (2025-12-11): 324 B at q=1, 16-byte pk. The design evolved (FIPS-205 compatibility, 2^40 stateless budget, faster stateful params). The plan's '~324 B' refers to the 2025 version."
+  - id: C-C007
+    statement: "Original SHRINCS (Dec 2025): with intact state, signature size is min(292 + q*16, s_l) + 16 bytes at NIST L1, i.e. 324 B for q = 1; the WOTS+C OTS is 292 B."
+    source: delving-shrincs-2158
+    location: "Post #1 (jonasnick, 2025-12-11)"
+    value: {ots_bytes: 292, auth_path_bytes_per_q: 16, sig_bytes_q1: 324}
+    confidence: H
+    verified_by_us: false
+    tags: [shrincs, size, superseded]
+  # ---------- Sizes / parameters stated on the list ----------
+  - id: C-C010
+    statement: "With WOTS+C/FORS+C/PORS+FP optimizations, SPHINCS+ signatures are 4036 B at a 2^40 signature bound, 3440 B at 2^30 and 3128 B at 2^20; standard SPHINCS+ is 'almost 8KB'."
+    source: ml-hbs-thread-2025
+    location: "Root message (Kudinov & Nick, 2025-12-08), paragraph 3"
+    value: {sig_bytes: {q2_40: 4036, q2_30: 3440, q2_20: 3128}, standard_sphincs: "almost 8KB"}
+    confidence: H
+    verified_by_us: false
+    tags: [params, size]
+  - id: C-C011
+    statement: "A 4480-byte signature at the 2^40 limit (Table 1 of the report) has a verification-cost-to-size ratio 'almost 9 times better' than Schnorr."
+    source: ml-kudinov-2025-12-09a
+    location: "Section 'On verification costs'"
+    value: {sig_bytes: 4480, sig_limit_log2: 40, verify_ratio_vs_schnorr: "almost 9x better"}
+    confidence: H
+    verified_by_us: false
+    tags: [params, verification]
+  - id: C-C012
+    statement: "The WOTS+C + PORS+FP variant is 16% to 18% smaller than vanilla, size-optimized SPHINCS+ for 2^40 signatures max (per costs.sage)."
+    source: ml-nick-2025-12-10
+    location: "Paragraph 1"
+    value: {size_reduction_pct: [16, 18], sig_limit_log2: 40}
+    confidence: H
+    verified_by_us: false
+    tags: [params, size, grinding]
+  - id: C-C013
+    statement: "Quantum attacks on 128-bit hash security require approximately 2^78 Toffoli depth in practice, with limited parallelization benefits."
+    source: ml-hbs-thread-2025
+    location: "Root message, security-targets paragraph"
+    value: {toffoli_depth_log2: 78}
+    confidence: M
+    verified_by_us: false
+    tags: [security, quantum-estimate]
+    notes: "A summary of the ePrint argument; Jonas Nick restates it on Delving 2158 #3 (SHA-256 circuit depth 2^14; '268 million quantum computers running Grover's algorithm for a decade')."
+  # ---------- Signer cost / latency ----------
+  - id: C-C020
+    statement: "Trezor benchmarks on the Model T: 75 seconds to create one SLH-DSA-SHA2-128s signature."
+    source: ml-conduition-2025-12-09
+    location: "Final section, citing gist onvej-sl/3851bdae7ae5aa1f2624ca769737ea2e"
+    value: {device: "Trezor Model T", scheme: SLH-DSA-SHA2-128s, sign_s: 75}
+    confidence: M
+    verified_by_us: false
+    tags: [class0, latency, hardware-wallet, secondhand]
+    notes: "Second-hand citation of a Trezor gist; Agent D should take the number from the gist."
+  - id: C-C021
+    statement: "conduition's optimized SLH-DSA-SHA2-128s signs in 11 ms and generates keys in 2 ms (1 ms batched) on his desktop CPU, versus PQClean's 94 ms and 12 ms. It needs several MB of RAM and does not help hardware wallets."
+    source: ml-slhdsa-perf-2025
+    location: "Root message (Google Groups render)"
+    value: {sign_ms: 11, keygen_ms: 2, keygen_batched_ms: 1, pqclean_sign_ms: 94, pqclean_keygen_ms: 12, ram: "several megabytes"}
+    confidence: M
+    verified_by_us: false
+    tags: [class2, latency, ram]
+    notes: "UNCERTAIN: not in the gnusha archive; read via a fetch-tool summary of Google Groups. A later archived message (conduition, 2026-06-09) says '10 to 12 milliseconds on my desktop CPU', which is consistent."
+  - id: C-C022
+    statement: "A Vulkan implementation of SLH-DSA-SHA2-128s signs in 2.67 ms on an RTX 3060 Ti (2025 benchmark)."
+    source: shrincs-bip-draft
+    location: "Footnote [^vulkan]"
+    value: {gpu: "RTX 3060 Ti", scheme: SLH-DSA-SHA2-128s, sign_ms: 2.67}
+    confidence: M
+    verified_by_us: false
+    tags: [class3, latency, gpu, secondhand]
+    notes: "Cited from conduition.io/code/fast-slh-dsa (blog). Useful as a Class-3 cross-check for E0/E4."
+  - id: C-C023
+    statement: "Blockstream measured mean signing times (100 runs) on HW wallets. SLH-DSA-SHA2-128 (7856 B): Jade Plus 52.85 s, Trezor Safe 3/5/7 65.31 s, Ledger Nano gen5/s+ 120.12 s, BitBox02 Nova 100.1 s. SPHINCS+ 2^40 (5776 B): 43.28 / 53.45 / 94.98 / 78.4 s."
+    source: blockstream-hww-blog-2026
+    location: "'The Numbers' SigGen table"
+    value: {slh_dsa_128_s: {jade_plus: 52.85, trezor: 65.31, ledger: 120.12, bitbox02_nova: 100.1}, sphincs_2_40_s: {jade_plus: 43.28, trezor: 53.45, ledger: 94.98, bitbox02_nova: 78.4}}
+    confidence: M
+    verified_by_us: false
+    tags: [class0, latency, hardware-wallet, mean-only]
+    notes: "Blog (secondary). Same 'average' reference C library on all devices, 70–240 MHz CPUs. No tail percentiles reported."
+  - id: C-C024
+    statement: "On the same HW wallets, UXMSS (SHRINCS-L, 1092 B) signing with WOTS+C target sum S_wn=96 takes 3.01–8.04 s (mean). With 'overgrinding' to S_wn=140 it takes 225.63–572.78 s (Jade 225.63, Trezor 264.74, Ledger 572.78, BitBox02 334.6)."
+    source: blockstream-hww-blog-2026
+    location: "SigGen table rows 'SHRINCS-L (swn=96, 1092 B)' and 'UXMSS (SHRINCS-L) (swn=140, 1092 B)'; text 'Due to overgrinding...'"
+    value: {swn_96_s: {jade_plus: 3.31, trezor: 3.01, ledger: 8.04, bitbox02_nova: 5.5}, swn_140_s: {jade_plus: 225.63, trezor: 264.74, ledger: 572.78, bitbox02_nova: 334.6}, w: 4, chains: 64}
+    confidence: M
+    verified_by_us: false
+    tags: [class0, grinding, latency, hardware-wallet, mean-only, key-for-grindstone]
+    notes: "The most direct published grinding-cost data on HW wallets. w=4 and l=64 come from Delving 2158 #20 (SHRINCS-L params n=16, w=4, l=64, S_wn=140). The blog's row labels are slightly inconsistent ('SHRINCS-L' vs 'UXMSS (SHRINCS-L)'); interpretation M."
+  - id: C-C025
+    statement: "SHRINCS-L benchmark on an Intel Core i5 (one thread): stateful signing 3742.92 ms, stateless signing 17974.8 ms; stateful verify 0.015506 ms, stateless verify 0.073762 ms. Stateful sig 1092 B (q=1), stateless sig 4396 B."
+    source: delving-shrincs-2158
+    location: "Post #20 (olkurbatov, 2026-03-16)"
+    value: {stateful_sign_ms: 3742.92, stateless_sign_ms: 17974.8, stateful_verify_ms: 0.015506, stateless_verify_ms: 0.073762, stateful_sig_bytes_q1: 1092, stateless_sig_bytes: 4396, params: "n=16, w=4, l=64, S_wn=140, h_sf=207, h_sl=24, d=2, k=6, a=22"}
+    confidence: H
+    verified_by_us: false
+    tags: [class2, grinding, latency, shrincs-l]
+    notes: "Liquid/Simplicity-oriented variant, not the Bitcoin SHRINCS draft."
+  - id: C-C026
+    statement: "SHRINCS draft average signing cost in SHA-256 compressions: stateless 1,707,229; stateful UXMSS depth 255 133,326 (depth 31: 16,510); BXMSS depth 10: 534,341."
+    source: shrincs-bip-draft
+    location: "Section 'Signing' table (CONST STATELESS_SIGN_COMPRESSIONS_AVG etc.)"
+    value: {stateless_avg: 1707229, uxmss31_avg: 16510, uxmss255_avg: 133326, bxmss10_avg: 534341}
+    confidence: H
+    verified_by_us: false
+    tags: [shrincs, signer-cost, compressions]
+    notes: "Templated constants in a living draft (commit 2d1679b, 2026-10-18); may change."
+  - id: C-C027
+    statement: "SHRINCS draft verification cost: stateful 255–509 compressions (max 0.465 C/B), stateless 467–2792 compressions (max 0.483 C/B). BIP-340 verification ≈ 127 compression-equivalents (1.98 per signature byte)."
+    source: shrincs-bip-draft
+    location: "Section 'Verification' table and following paragraph"
+    value: {stateful_verify: [255, 509], stateless_verify: [467, 2792], bip340_equiv_compressions: 127, bip340_cpb: 1.98}
+    confidence: H
+    verified_by_us: false
+    tags: [shrincs, verification]
+  - id: C-C028
+    statement: "SHRINCS stateless parameters: SLH-DSA (FIPS-205 algorithms) with n=16, lg_w=4, d=5, h'=9, a=13, k=10; 2^40 budget; 26% smaller than SLH-DSA-SHA2-128s; 23% fewer compressions for average signing and 28% fewer for worst-case verification. No FORS+C or PORS+FP is used."
+    source: shrincs-bip-draft
+    location: "Sections 'Stateless Parameters' and 'Why not use a standardized SLH-DSA parameter set?'"
+    value: {n: 16, lg_w: 4, d: 5, h_prime: 9, a: 13, k: 10, budget_log2: 40, size_reduction_pct: 26, sign_reduction_pct: 23, verify_reduction_pct: 28}
+    confidence: H
+    verified_by_us: false
+    tags: [shrincs, params, scope-for-grindstone]
+  - id: C-C029
+    statement: "SHRINCS WOTS+C grind: H_grind = sha256(pk_seed || zeros(48) || ADRS[:10] || digest(32 B) || zeros(4) || counter(u16))[:16]. At most 2^16 attempts. With w=16 and 32 chains, about 2^122 of 2^128 index sets hit the constant sum 240, so P(success) ≈ 2^-6 (derived). Failure probability < 2^-1450."
+    source: shrincs-bip-draft
+    location: "Sections 'H_grind(...)', 'wots_c_grind_to_constant_sum(...)', 'Stateful Parameters/Constants'"
+    value: {counter_bits: 16, max_attempts: 65536, chains: 32, chain_bits: 4, constant_sum: 240, frac_valid_log2: -6, fail_prob_log2: -1450, compressions_per_attempt_derived: 1}
+    confidence: H
+    verified_by_us: false
+    tags: [shrincs, grinding, layout, derived, key-for-grindstone]
+    notes: "Differs from plan §3.5 (32-bit counter, 16-B m, 42-B layout). The first 64-B block (pk_seed||zeros(48)) is constant, so a cached midstate gives one compression per attempt (our derivation). The '2^122 of 2^128' figure is marked TODO-template in the draft. Our formula in plan §3.5 gives E[tries] ≈ 65.7 for w=16, len1=32, S=240, which is consistent."
+  - id: C-C030
+    statement: "SHRINCS draft: the stateless PRF_msg_sl may be replaced with an XOF from which the signer samples multiple randomizers to grind for hypertree pruning, trading signature budget for faster signing/keygen on low-power devices."
+    source: shrincs-bip-draft
+    location: "Notes under tweakable-hash/PRF definitions; 'What about hardware wallets?'"
+    value: {grind_type: "R-grinding (randomizer)", purpose: hypertree-pruning}
+    confidence: H
+    verified_by_us: false
+    tags: [shrincs, grinding, hardware-wallet, key-for-grindstone]
+  - id: C-C031
+    statement: "SHRIMPS compact path: 2564 B at q_s = 2^10 with (k,a,h,d) = (8,17,12,1), w=16, S_wn=240, costing 6.8M compressions to sign. SLH-DSA (q_s = 2^64) is 7856 B at 2.3M compressions. Verification is 0.30 C/B for SLH-DSA vs ~0.19 for d=1 sets."
+    source: delving-shrimps-2355
+    location: "Post #1 (jonasnick, 2026-03-27), parameter table"
+    value: {sig_bytes: 2564, q_s_log2: 10, sign_compressions: 6.8e6, slh_dsa_sign_compressions: 2.3e6, slh_dsa_bytes: 7856}
+    confidence: H
+    verified_by_us: false
+    tags: [params, grinding, signer-cost, shrimps]
+  - id: C-C032
+    statement: "Generating a SPHINCS+ signature via generic MPC is estimated to take around 85 minutes."
+    source: ml-hbs-thread-2025
+    location: "Kudinov reply to Boris Nagaev, 2025-12-10 00:01 UTC, citing report §15.3"
+    value: {mpc_sign_minutes: 85}
+    confidence: M
+    verified_by_us: false
+    tags: [mpc, latency, secondhand]
+  # ---------- Fees / weight ----------
+  - id: C-C040
+    statement: "For a 2-input 2-output tx, P2TR+Schnorr weighs 840 WU and P2MR+SHRINCS (stateless) weighs 12426 WU, a ~14.8x difference."
+    source: ml-shrincs-draft-2026
+    location: "conduition reply 2026-09-04 (2fb38fb8-...)"
+    value: {p2tr_wu: 840, p2mr_shrincs_stateless_wu: 12426, ratio: 14.8, non_witness_bytes: 178, witness_bytes_per_input: 5857}
+    confidence: H
+    verified_by_us: false
+    tags: [fees, vbytes, cross-check-agent-E]
+  - id: C-C041
+    statement: "P2TR 1-in-2-out key-path spend is 154 vB. P2MR 1-in-2-out spending a Schnorr leaf (two-leaf tree with a PQ leaf) is 171.25 vB, +17.25 vB (11%)."
+    source: ml-pq-output-type-2026
+    location: "Ethan Heilman, 2026-04-11 00:20 UTC (CAEM=y+UYBQoocr95ucutw_9QoTuyRcpGPTf_1wgazzK3nbFyyQ@mail.gmail.com)"
+    value: {p2tr_keypath_vb: 154, p2mr_schnorr_leaf_vb: 171.25, delta_vb: 17.25}
+    confidence: H
+    verified_by_us: false
+    tags: [fees, vbytes, bip360, cross-check-agent-E]
+  - id: C-C042
+    statement: "SLH-DSA with h=40 d=4 a=13 k=12 w=4 gives 7696-byte signatures costing about 1000 SHA-256 compressions to verify, about 64x cheaper per byte than Schnorr with hardware acceleration."
+    source: delving-pqc-output-2749
+    location: "Post #9 (conduition, 2026-08-22)"
+    value: {h: 40, d: 4, a: 13, k: 12, w: 4, sig_bytes: 7696, verify_compressions: 1000}
+    confidence: M
+    verified_by_us: false
+    tags: [params, verification]
+  - id: C-C043
+    statement: "A 10-thread CPU prover (naive extension of Flock benchmarks) proves ~338000 SHA-256 compressions/s, ~482 signature verifications/s for h=36 d=4 a=13 k=15 w=4, ~20 s per block of ~10,000 signatures."
+    source: delving-snark-agg-2875
+    location: "Post #10 (conduition, 2026-09-16)"
+    value: {compressions_per_s: 338000, sigs_per_s: 482, block_prove_s: 20}
+    confidence: L
+    verified_by_us: false
+    tags: [proving, verification, extrapolated]
+  # ---------- Quantum resource estimates ----------
+  - id: C-C050
+    statement: "Citing the Google Quantum AI whitepaper (p.7), conduition states a QC needs at least 4.5*n logical qubits to break an n-bit curve with a practical Toffoli count, so 'Breaking secp256k1 requires at least 1200.'"
+    source: ml-ec-disabling-2026
+    location: "conduition, 2026-08-16 19:30 UTC; the same text is re-quoted by waxwing 2026-08-18"
+    value: {logical_qubits_per_bit: 4.5, secp256k1_logical_qubits: 1200, framing: "at least"}
+    confidence: M
+    verified_by_us: false
+    tags: [quantum-estimate, timeline, secondhand]
+    notes: "CONFLICT IN FRAMING: the plan §1.1 says Google estimates secp256k1 at '≤1,200 logical qubits'; conduition says 'at least 1200'. These may refer to different things (an upper bound for the paper's circuit vs. a lower bound across curve sizes). Read the primary whitepaper before using either."
+  - id: C-C051
+    statement: "IonQ (Sep 2026) estimate of 1,457 logical qubits / ~39M Toffoli for secp256k1 (as stated in the plan)."
+    source: none-found
+    location: "Not found in the bitcoindev or Delving sources Agent C searched (gnusha queries 'IonQ', 'Toffoli', 'logical qubits')"
+    value: {logical_qubits: 1457, toffoli: 3.9e7}
+    confidence: L
+    verified_by_us: false
+    tags: [quantum-estimate, timeline, unverified, not-found-in-C-sources]
+    notes: "Not discussed on the list as far as Agent C found. Needs a primary IonQ source before use."

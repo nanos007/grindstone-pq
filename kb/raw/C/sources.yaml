@@ -1,0 +1,239 @@
+# Agent C (Mailing-List Ethnographer) sources, compiled 2026-10-22. Schema per plan section 3.2.
+# Mailing-list text was taken from gnusha.org public-inbox mbox exports (raw message bodies).
+# Delving text was taken from the Discourse JSON API. Dates are UTC.
+sources:
+  - id: ml-hbs-thread-2025
+    title: "Hash-Based Signatures for Bitcoin's Post-Quantum Future (thread, 17 messages)"
+    authors: [Mikhail Kudinov, Jonas Nick, Greg Maxwell, conduition, Boris Nagaev, Olaoluwa Osuntokun, Erik Aronesty, david torrealba]
+    venue: bitcoindev mailing list
+    date: 2025-12-08
+    url: https://gnusha.org/pi/bitcoindev/3e815d03-5e21-41ed-ba1a-4f9b2120a986n@googlegroups.com/T/
+    type: mailing-list
+    trust: primary
+    notes: "Root by Kudinov & Nick 2025-12-08 20:28 UTC; last reply conduition 2026-01-19. Google Groups mirror: https://groups.google.com/g/bitcoindev/c/gOfL5ag_bDU"
+  - id: ml-maxwell-2025-12-08
+    title: "Re: Hash-Based Signatures for Bitcoin's Post-Quantum Future"
+    authors: [Greg Maxwell]
+    venue: bitcoindev mailing list
+    date: 2025-12-08
+    url: https://gnusha.org/pi/bitcoindev/CAAS2fgSrGz1-ShUfhx_-jZm_W__ZBquMLbVGQriCYS6khfV46Q@mail.gmail.com/
+    type: mailing-list
+    trust: primary
+  - id: ml-conduition-2025-12-09
+    title: "Re: Hash-Based Signatures for Bitcoin's Post-Quantum Future"
+    authors: [conduition]
+    venue: bitcoindev mailing list
+    date: 2025-12-09
+    url: https://gnusha.org/pi/bitcoindev/0e2402c5-d593-49ff-b002-5ab348b46964n@googlegroups.com/
+    type: mailing-list
+    trust: primary
+  - id: ml-kudinov-2025-12-09a
+    title: "Re: Hash-Based Signatures for Bitcoin's Post-Quantum Future (reply to Greg Maxwell)"
+    authors: [Mikhail Kudinov]
+    venue: bitcoindev mailing list
+    date: 2025-12-09
+    url: https://gnusha.org/pi/bitcoindev/CAPcK4uQBvfWpNsOdOwW++L_LgUxFH-9CvY7YFKb1b5OzJgJ_1A@mail.gmail.com/
+    type: mailing-list
+    trust: primary
+  - id: ml-kudinov-2025-12-09b
+    title: "Re: Hash-Based Signatures for Bitcoin's Post-Quantum Future (reply to conduition)"
+    authors: [Mikhail Kudinov]
+    venue: bitcoindev mailing list
+    date: 2025-12-09
+    url: https://gnusha.org/pi/bitcoindev/CAPcK4uRf0hBNNiQUxLg1wWqJ2-P-e4FrfyB0t6hsd96PfMOYcA@mail.gmail.com/
+    type: mailing-list
+    trust: primary
+  - id: ml-conduition-2025-12-10
+    title: "Re: Hash-Based Signatures for Bitcoin's Post-Quantum Future (compatibility)"
+    authors: [conduition]
+    venue: bitcoindev mailing list
+    date: 2025-12-10
+    url: https://gnusha.org/pi/bitcoindev/018ee35e-af3d-49d8-a8f2-5c478e681efan@googlegroups.com/
+    type: mailing-list
+    trust: primary
+  - id: ml-nick-2025-12-10
+    title: "Re: Hash-Based Signatures for Bitcoin's Post-Quantum Future"
+    authors: [Jonas Nick]
+    venue: bitcoindev mailing list
+    date: 2025-12-10
+    url: https://gnusha.org/pi/bitcoindev/27070789-50f0-4d2d-a107-c90be445db14@gmail.com/
+    type: mailing-list
+    trust: primary
+  - id: ml-nick-2025-12-16
+    title: "Re: Hash-Based Signatures for Bitcoin's Post-Quantum Future (MPC)"
+    authors: [Jonas Nick]
+    venue: bitcoindev mailing list
+    date: 2025-12-16
+    url: https://gnusha.org/pi/bitcoindev/34eaa8a5-69c1-4825-8f00-ff6de755ba09@gmail.com/
+    type: mailing-list
+    trust: primary
+  - id: ml-nagaev-2025-12-09
+    title: "Re: Hash-Based Signatures for Bitcoin's Post-Quantum Future (N/N MPC)"
+    authors: [Boris Nagaev]
+    venue: bitcoindev mailing list
+    date: 2025-12-09
+    url: https://gnusha.org/pi/bitcoindev/492feee7-e0da-4d4d-bb7a-e903b321a977n@googlegroups.com/
+    type: mailing-list
+    trust: primary
+  - id: ml-slhdsa-perf-2025
+    title: "SLH-DSA (SPHINCS) Performance Optimization Techniques"
+    authors: [conduition]
+    venue: bitcoindev mailing list
+    date: 2025-11-24
+    url: https://groups.google.com/g/bitcoindev/c/LAll07BHwjw
+    type: mailing-list
+    trust: primary
+    notes: "UNCERTAIN: the root message (Message-ID d463887f-3a9e-48a5-b61a-8680646a370an@googlegroups.com) is missing from the gnusha and b10c archives. Quotes come from the Google Groups render via a fetch tool and need re-checking against the raw message. Tim Ruffing's reply is archived: https://gnusha.org/pi/bitcoindev/6ad6c7418b6b845d6e2dd0ccdb2b508de0c3c10c.camel@real-or-random.org/"
+  - id: ml-look-at-shrincs-2026
+    title: "A look at SHRINCS (thread, 4 messages)"
+    authors: [Patrick Cerri, conduition]
+    venue: bitcoindev mailing list
+    date: 2026-06-09
+    url: https://gnusha.org/pi/bitcoindev/CAOWv0+Ux1AiLbUagF8eWsmvMQ-xvu438WsOJ+r0MzsqbHWerOQ@mail.gmail.com/T/
+    type: mailing-list
+    trust: primary
+  - id: ml-shrincs-draft-2026
+    title: "SHRINCS: an efficient hash-based signature scheme for Bitcoin (first draft) (thread)"
+    authors: [conduition, Antoine Riard, Murch]
+    venue: bitcoindev mailing list
+    date: 2026-08-26
+    url: https://gnusha.org/pi/bitcoindev/-w8D4WbD7zY2bfYQIES40iBZQWbZx6ab-S6EW8tWsMEFaHO9NEOLUkte_MZZgNQDd0pljCM2wD1Ccnk3BfjwLPgCiVz-NfTwjHJ4aZHUqUw=@proton.me/T/
+    type: mailing-list
+    trust: primary
+    notes: "Replies: Riard 2026-08-31 (b4bb949d-...), conduition 2026-09-04 (2fb38fb8-...), Murch 2026-09-11/15, conduition 2026-09-13/19."
+  - id: ml-pq-output-type-2026
+    title: "In defense of a PQ output type (thread)"
+    authors: [Antoine Poinsot, Matt Corallo, conduition, Ethan Heilman, Olaoluwa Osuntokun, Anthony Towns, others]
+    venue: bitcoindev mailing list
+    date: 2026-04-09
+    url: https://gnusha.org/pi/bitcoindev/cba894e1-f830-4ad5-9498-09f04faaadf7@mattcorallo.com/T/
+    type: mailing-list
+    trust: primary
+  - id: ml-pqc-goal-2026
+    title: "PQC - What is our Goal, Even? (thread)"
+    authors: [Matt Corallo, conduition, others]
+    venue: bitcoindev mailing list
+    date: 2026-04-15
+    url: https://gnusha.org/pi/bitcoindev/CF7A554D-EE6F-4E6B-A670-1D6F72170539@mattcorallo.com/
+    type: mailing-list
+    trust: primary
+  - id: ml-pqc-lattice-2026
+    title: "PQC: Lattice-based signatures (thread)"
+    authors: [Nikita Karetnikov, conduition, Mikhail Kudinov, others]
+    venue: bitcoindev mailing list
+    date: 2026-05-19
+    url: https://gnusha.org/pi/bitcoindev/ffa56d63-32c6-4fc3-a150-4fe62ac2e00b@app.fastmail.com/T/
+    type: mailing-list
+    trust: primary
+  - id: ml-ec-disabling-2026
+    title: "Re: Giving teeth to expected EC disabling: P2XX(-T)(-ML)"
+    authors: [conduition]
+    venue: bitcoindev mailing list
+    date: 2026-08-16
+    url: https://gnusha.org/pi/bitcoindev/22f8b95d-403c-4a3e-ad64-221faf2ea851n@googlegroups.com/
+    type: mailing-list
+    trust: primary
+  - id: delving-shrincs-2158
+    title: "SHRINCS: 324-byte stateful post-quantum signatures with static backups"
+    authors: [Jonas Nick, conduition, moonsettler, Greg Maxwell, Ethan Heilman, Mikhail Kudinov, Oleksandr Kurbatov]
+    venue: Delving Bitcoin
+    date: 2025-12-11
+    url: https://delvingbitcoin.org/t/shrincs-324-byte-stateful-post-quantum-signatures-with-static-backups/2158
+    type: mailing-list
+    trust: primary
+    notes: "Forum thread, 22 posts through 2026-07-01. Post #20 (olkurbatov) holds the SHRINCS-L Liquid benchmark."
+  - id: delving-shrimps-2355
+    title: "SHRIMPS: 2.5 KB post-quantum signatures across multiple stateful devices"
+    authors: [Jonas Nick, niklaus, conduition]
+    venue: Delving Bitcoin
+    date: 2026-03-27
+    url: https://delvingbitcoin.org/t/shrimps-2-5-kb-post-quantum-signatures-across-multiple-stateful-devices/2355
+    type: mailing-list
+    trust: primary
+  - id: delving-pqc-output-2749
+    title: "PQC output type discussion"
+    authors: [Pieter Wuille, conduition, Antoine Riard, Sjors Provoost, others]
+    venue: Delving Bitcoin
+    date: 2026-07-27
+    url: https://delvingbitcoin.org/t/pqc-output-type-discussion/2749
+    type: mailing-list
+    trust: primary
+  - id: delving-pq-witness-2702
+    title: "Segwit commitment to post-quantum witness data?"
+    authors: [Pieter Wuille, conduition, others]
+    venue: Delving Bitcoin
+    date: 2026-07-10
+    url: https://delvingbitcoin.org/t/segwit-commitment-to-post-quantum-witness-data/2702
+    type: mailing-list
+    trust: primary
+  - id: delving-snark-agg-2875
+    title: "Block-wide Signature Aggregation via SNARKs"
+    authors: [conduition, EthnTuttle, others]
+    venue: Delving Bitcoin
+    date: 2026-09-04
+    url: https://delvingbitcoin.org/t/block-wide-signature-aggregation-via-snarks/2875
+    type: mailing-list
+    trust: primary
+  - id: delving-libshrincs-2795
+    title: "Libshrincs: A C implementation with a machine-checked security proof"
+    authors: [Jonas Nick]
+    venue: Delving Bitcoin
+    date: 2026-08-11
+    url: https://delvingbitcoin.org/t/2795
+    type: mailing-list
+    trust: primary
+    notes: "Skimmed only; not used for requirements."
+  - id: delving-bip360-1811-2170
+    title: "Changes to BIP-360 - Pay to Quantum Resistant Hash (P2QRH) / Major BIP 360 Update"
+    authors: [Hunter Beast, Ethan Heilman, others]
+    venue: Delving Bitcoin
+    date: 2025-07-07
+    url: https://delvingbitcoin.org/t/1811
+    type: mailing-list
+    trust: primary
+    notes: "Also https://delvingbitcoin.org/t/2170 (2025-12-19). Keyword scan found no signer-cost, RAM or grinding content, so neither thread was used for requirements."
+  - id: bip-0360
+    title: "BIP 360: Pay-to-Merkle-Root (P2MR)"
+    authors: [Hunter Beast, Ethan Heilman, Isabel Foxen Duke]
+    venue: bitcoin/bips GitHub repository
+    date: 2026-02-11
+    url: https://github.com/bitcoin/bips/blob/master/bip-0360.mediawiki
+    type: standard
+    trust: primary
+    notes: "Merged in commit eae7d9fc57 (PR #1670) on 2026-02-11T21:01:47Z. Status Draft, Version 0.12.1 at fetch time. Latest file commit e7263a4cfe (2026-08-03)."
+  - id: shrincs-bip-draft
+    title: "SHRINCS: A Compact Hash-Based Signature Scheme (draft BIP)"
+    authors: [conduition, Ethan Heilman, Mikhail Kudinov, Oleksandr Kurbatov, Jonas Nick, remix7531]
+    venue: GitHub SHRINCS/shrincs-bip
+    date: 2026-08-26
+    url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+    type: code
+    trust: primary
+    notes: "Living document. Read at commit 2d1679b25b (2026-10-18). Numbers sit in CONST templates and may change."
+  - id: blockstream-hww-blog-2026
+    title: "Are Hardware Wallets Ready to Produce Post-Quantum Signatures?"
+    authors: [Blockstream Team]
+    venue: Blockstream blog
+    date: 2026-08-19
+    url: https://blog.blockstream.com/hardware-wallets-post-quantum-signatures/
+    type: news
+    trust: secondary
+    notes: "First-party benchmark publication by Blockstream Research; reviewers include Jonas Nick and Mike Kudinov. Treat the numbers as the authors' measurements, not as peer-reviewed. Means only, over 100 runs; no tails. Uses the same reference C library on every device."
+  - id: kudinov-nick-2025
+    title: "Hash-based Signature Schemes for Bitcoin"
+    authors: [Mikhail Kudinov, Jonas Nick]
+    venue: IACR ePrint 2025/2203
+    date: 2025-12-08
+    url: https://eprint.iacr.org/2025/2203
+    type: paper
+    trust: primary
+    notes: "Referenced by the threads only; not read by Agent C (Agent A/B scope)."
+  - id: google-qai-2026
+    title: "Securing Elliptic Curve Cryptocurrencies against Quantum Vulnerabilities (Google Quantum AI whitepaper)"
+    authors: [Google Quantum AI]
+    venue: whitepaper
+    date: 2026-03
+    url: https://quantumai.google/static/site-assets/downloads/cryptocurrency-whitepaper.pdf
+    type: paper
+    trust: primary
+    notes: "Cited on bitcoindev by conduition (2026-08-16). Not read by Agent C. Date taken from the plan, unverified."

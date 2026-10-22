@@ -1,0 +1,11 @@
+id: kudinov-nick-2025
+title: Hash-based Signature Schemes for Bitcoin
+authors:
+- Mikhail Kudinov
+- Jonas Nick
+venue: IACR ePrint 2025/2203
+date: 2025-12-08
+url: https://eprint.iacr.org/2025/2203
+type: paper
+trust: primary
+notes: Referenced by the threads only; not read by Agent C (Agent A/B scope).

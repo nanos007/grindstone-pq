@@ -1,0 +1,408 @@
+# Agent A claims. Schema per plan §3.3, plus source_url / date (global agent rules).
+# "date" = publication/commit date of the source; all accessed 2026-10-22.
+# Sources:
+#   kudinov-nick-2025   https://eprint.iacr.org/2025/2203.pdf (PDF "Revision 2025-12-05")
+#   spx-params-repo     https://github.com/BlockstreamResearch/SPHINCS-Parameters @ ceee8ed (2026-08-26)
+#   sphincs-c-2022      https://eprint.iacr.org/2022/778.pdf (2022-09-14)
+#   sphincs-c-code      https://github.com/eyalr0/sphincsplusc @ f36a76b (2022-06-18)
+#   fips205             https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf (2024-08)
+#   shrincs-bip         https://github.com/SHRINCS/shrincs-bip @ 2d1679b (2026-10-18), SHRINCS.md
+#   shrincs-cpp         https://github.com/BlockstreamResearch/shrincs-cpp @ 7643d95 (2026-05-01)
+#   abri-pors-fp        https://github.com/MehdiAbri/PORS-FP @ bdf38ee (2025-11-13)
+#   grindstone-agentA   our own computation (scratchpad scripts calc.py, masks.py, octo_check.py, smoke.py)
+
+- id: A-001
+  statement: "FIPS 205 SHA2 category-1 H_msg is MGF1-SHA-256(R || PK.seed || SHA-256(R || PK.seed || PK.root || M), m)."
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: "§11.2.1, p.45"
+  date: 2024-08-13
+  value: {construction: "MGF1-SHA-256 over R||PK.seed||SHA-256(R||PK.seed||PK.root||M)"}
+  confidence: H
+  verified_by_us: false
+  tags: [hmsg, sha2, spec]
+
+- id: A-002
+  statement: "FIPS 205 SHA2 category-1 PRF_msg is Trunc_n(HMAC-SHA-256(SK.prf, opt_rand || M)); F/H/T_l/PRF prepend PK.seed || toByte(0, 64-n) then the 22-byte ADRSc."
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: "§11.2.1, p.45-46"
+  date: 2024-08-13
+  value: {prf_msg: "Trunc_n(HMAC-SHA-256(SK.prf, opt_rand||M))", pkseed_pad_bytes: 48}
+  confidence: H
+  verified_by_us: false
+  tags: [prf_msg, sha2, spec]
+
+- id: A-003
+  statement: "Compressed address ADRSc = ADRS[3] || ADRS[8:16] || ADRS[19] || ADRS[20:32] (22 bytes: layer 1, tree 8, type 1, 12 payload)."
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: "§11.2, Figure 18, Table 3, p.45"
+  date: 2024-08-13
+  value: {adrsc_bytes: 22}
+  confidence: H
+  verified_by_us: false
+  tags: [adrs, spec]
+
+- id: A-004
+  statement: "base_2b returns the first out_len*b bits of X as integers, reading bytes in big-endian bit order (MSB first)."
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: "§4.4, Algorithm 4, p.15-16"
+  date: 2024-08-13
+  value: {bit_order: MSB-first}
+  confidence: H
+  verified_by_us: false
+  tags: [encoding, spec]
+
+- id: A-005
+  statement: "SLH-DSA digest split: md = digest[0:ceil(k*a/8)], then ceil((h-h/d)/8) bytes idx_tree, then ceil(h/(8d)) bytes idx_leaf; fors_sign uses base_2b(md, a, k), tree i <- indices[i]."
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: "§9.2 Algorithm 19 lines 6-10, p.34-35; §8 Algorithm 16, p.30; m formula §9, p.33"
+  date: 2024-08-13
+  value: {m_formula: "ceil((h-h')/8) + ceil(k*a/8) + ceil(h'/8)"}
+  confidence: H
+  verified_by_us: false
+  tags: [digest, fors, spec]
+
+- id: A-006
+  statement: "KN define the WOTS+C digest as d = Th(P, T*, m||count), count in {0,1}^r, without fixing tweak type value, counter width or endianness."
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: "§5, p.11-12"
+  date: 2025-12-05
+  value: {form: "Th(P, T*_adrs, m||count)"}
+  confidence: H
+  verified_by_us: false
+  tags: [wots_c, ambiguity3]
+
+- id: A-007
+  statement: "KN state the zero-chain condition as 'forall i in [w-1-z+1, w-1]: a_i = 0' and omit 'the last z chains'; SPHINCS+C states 'forall i in [z]: a_i = 0' (first z chains). Sources conflict; GRINDSTONE v1 uses z = 0."
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: "KN §5 p.11-12 + footnote 3; SPHINCS+C §3 p.4-5 Alg.6 l.5"
+  date: 2025-12-05
+  value: {kn_range: "[w-1-z+1, w-1]", sphincs_c_range: "[z]", grindstone_z: 0}
+  confidence: H
+  verified_by_us: false
+  tags: [wots_c, ambiguity2, conflict]
+
+- id: A-008
+  statement: "WOTS+C success probability with optional z_b zero bits is p = nu / (w^l * 2^z_b); tail P(T > k) = (1 - p)^k."
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: "§5.1, p.13-14, eq. (1)"
+  date: 2025-12-05
+  value: {formula: "nu/(w^l*2^z_b)"}
+  confidence: H
+  verified_by_us: false
+  tags: [wots_c, model]
+
+- id: A-009
+  statement: "Recomputed WOTS+C expected tries per layer: 65.7 (w=16,S=240), 1335.3 (w=16,S=304), 748.0 (w=256,S=2040), 30143.4 (w=256,S=2840); Python smoke test of the v1 layout gave mean 65.85 over 2000 samples for w=16,S=240."
+  source: grindstone-agentA
+  source_url: "local: scratchpad/agentA/scripts/calc.py, smoke.py"
+  location: "calc.py output; smoke.py output"
+  date: 2026-10-22
+  value: {E_16_240: 65.7, E_16_304: 1335.3, E_256_2040: 748.0, E_256_2840: 30143.4, smoke_mean_16_240: 65.85, smoke_n: 2000}
+  confidence: H
+  verified_by_us: false
+  tags: [wots_c, model, our_computation]
+
+- id: A-010
+  statement: "SPHINCS+C reference code puts the WOTS+C counter inside the address (new type 7 'WOTS+C message compression', 4-byte big-endian counter at ADRS byte offset 24), hashes only the root, and starts counting at 1 (0 = not found)."
+  source: sphincs-c-code
+  source_url: https://github.com/eyalr0/sphincsplusc
+  location: "ref/address.h l.14 (SPX_ADDR_TYPE_COMPRESS_WOTS 7); ref/shake_offsets.h l.18 (SPX_OFFSER_COUNTER 24); ref/merkle.c wots counter loop; paper §7.2 p.19"
+  date: 2022-06-18
+  value: {type: 7, counter_bytes: 4, counter_offset_in_adrs32: 24, endianness: big, first_counter: 1}
+  confidence: H
+  verified_by_us: false
+  tags: [wots_c, ambiguity3, code]
+
+- id: A-011
+  statement: "SHRINCS stateful WOTS+C grind: H_grind = sha256(pk_seed || zeros(48) || ADRS[:10] || digest(32) || zeros(4) || counter.to_bytes(2))[:16], ADRS type SF_WOTS_C_GRIND = 22, 16-bit big-endian counter, lowest valid counter, at most 2^16 tries; extra 4 zero bytes align the counter to a SHA-256 schedule word."
+  source: shrincs-bip
+  source_url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+  location: "SHRINCS.md l.621 (ADRS types), l.933-938 (H_grind), l.1546-1561 (wots_c_grind_to_constant_sum)"
+  date: 2026-10-18
+  value: {type: 22, counter_bits: 16, endianness: big, max_tries: 65536, adrs_bytes_hashed: 10, claimed_fail_log2: -1450}
+  confidence: H
+  verified_by_us: false
+  tags: [wots_c, ambiguity3, shrincs]
+
+- id: A-012
+  statement: "A 16-bit WOTS+C counter (SHRINCS) would fail with ~11% probability per layer for w=256, S=2840 (p = 3.317e-5, (1-p)^65536 ~ e^-2.17); 4-byte counters (REPO counter_size = 4) are needed for high-S rows."
+  source: grindstone-agentA
+  source_url: "local: scratchpad/agentA/scripts/calc.py"
+  location: "derived from A-009 p values"
+  date: 2026-10-22
+  value: {p: 3.317470e-05, fail_prob_16bit: 0.11}
+  confidence: H
+  verified_by_us: false
+  tags: [wots_c, counter_width, our_computation]
+
+- id: A-013
+  statement: "GRINDSTONE v1 WOTS+C layout: second SHA-256 block = ADRSc*(type 7, layer, tree, keypair=leaf, 8 zero bytes) || m(16) || count(4, BE) = 42 bytes + padding (bit length 848), i.e. exactly 1 compression after the cached PK.seed midstate."
+  source: grindstone-agentA
+  source_url: "local: kb/raw/A/pseudocode.md §1"
+  location: "pseudocode.md §1"
+  date: 2026-10-22
+  value: {block2_payload_bytes: 42, msg_bitlen: 848, compressions_per_attempt: 1, adrs_type: 7, counter_bytes: 4}
+  confidence: H
+  verified_by_us: false
+  tags: [wots_c, decision, our_choice]
+
+- id: A-014
+  statement: "KN FORS+C: force the last tree to open the first leaf, 'equivalent to requiring that the last a bits of the digest of the message that is signed by FORS are all zeros'."
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: "§9.2, p.21"
+  date: 2025-12-05
+  value: {condition: "last tree index = 0"}
+  confidence: H
+  verified_by_us: false
+  tags: [fors_c, ambiguity1]
+
+- id: A-015
+  statement: "SPHINCS+C text conflicts on position: §4.1 says the digest 'ends with b bits of zero', §7.1 says 'until the first t' bits ... are zero'; the SHAKE reference code checks a dedicated zero field at the front of the H_msg output (low SPX_FORS_ZERO_LAST_BITS bits of the first ceil(Z/8) bytes), separate from the FORS message bytes."
+  source: sphincs-c-2022
+  source_url: https://eprint.iacr.org/2022/778.pdf
+  location: "§4.1 p.8; §7.1 p.18; code ref/hash_shake.c hash_message()"
+  date: 2022-09-14
+  value: {paper_41: last, paper_71: first, code: "prefix field"}
+  confidence: H
+  verified_by_us: false
+  tags: [fors_c, ambiguity1, conflict]
+
+- id: A-016
+  statement: "GRINDSTONE v1 FORS+C acceptance: base_2b(md, a, k)[k-1] == 0, i.e. digest bits [(k-1)a, ka) (MSB-first) are zero; e.g. for 2^30 (h=32,d=4,a=14,k=10) bits [126,140): d[15]&0x03, d[16]&0xFF, d[17]&0xF0 must be 0."
+  source: grindstone-agentA
+  source_url: "local: kb/raw/A/pseudocode.md §0"
+  location: "pseudocode.md §0 table"
+  date: 2026-10-22
+  value: {bits: "[(k-1)a, ka)", example_2_30: "d[15]&0x03 d[16]&0xFF d[17]&0xF0"}
+  confidence: H
+  verified_by_us: false
+  tags: [fors_c, decision]
+
+- id: A-017
+  statement: "FIPS 205 m (bytes) for REPO F+C/P+FP rows: 23 (44,4,16,8), 25 (40,5,14,11), 21 (36,3,14,9), 22 (33,3,15,9), 22 (32,4,14,10), 20 (24,2,16,8), 23 (20,2,15,10); all <= 32, so one MGF1-SHA-256 output block."
+  source: grindstone-agentA
+  source_url: "local: scratchpad/agentA/scripts/calc.py"
+  location: "calc.py output"
+  date: 2026-10-22
+  value: {m_44_4_16_8: 23, m_40_5_14_11: 25, m_36_3_14_9: 21, m_33_3_15_9: 22, m_32_4_14_10: 22, m_24_2_16_8: 20, m_20_2_15_10: 23}
+  confidence: H
+  verified_by_us: false
+  tags: [hmsg, params, our_computation]
+
+- id: A-018
+  statement: "REPO models C_Hmsg = 2 ('Message hash: PKseed + PKroot (128) + R (256) + m (256)') and C_PRFmsg = 2 ('SKprf (128) + Opt + m (256) + counter'); FORS+C/PORS+FP grind attempt cost = C_Hmsg + C_PRFmsg = 4."
+  source: spx-params-repo
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed/costs.sage
+  location: "costs.sage l.61-62, l.432 (c_msg), l.342 (fors_c_expected_search_time)"
+  date: 2026-08-26
+  value: {C_Hmsg: 2, C_PRFmsg: 2, per_attempt: 4}
+  confidence: H
+  verified_by_us: false
+  tags: [hmsg, cost_model, ambiguity4]
+
+- id: A-019
+  statement: "KN state that signing a 256-bit digest 'results in two compression function calls for H_msg'."
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: "§13.2, p.35-36"
+  date: 2025-12-05
+  value: {hmsg_compressions_claimed: 2}
+  confidence: H
+  verified_by_us: false
+  tags: [hmsg, cost_model, ambiguity4]
+
+- id: A-020
+  statement: "Under FIPS 205 SHA2 H_msg with M = 32 bytes, n = 16: inner SHA-256 over 80 B = 2 compressions, one MGF1 block over 68 B = 2 compressions, total 4 (also 4 with |R| = 32: 96 B and 84 B). This conflicts with A-018/A-019 (2)."
+  source: grindstone-agentA
+  source_url: "local: scratchpad/agentA/scripts/calc.py"
+  location: "blocks(L) = ceil((L+9)/64)"
+  date: 2026-10-22
+  value: {inner_bytes: 80, inner_compr: 2, outer_bytes: 68, outer_compr: 2, total: 4}
+  confidence: H
+  verified_by_us: false
+  tags: [hmsg, ambiguity4, conflict, our_computation]
+
+- id: A-021
+  statement: "PRF_msg = HMAC-SHA-256 with 16-byte key over opt_rand(16)||M(32)[||ctr4]: inner 112/116 B -> 2 compressions, outer 96 B -> 2; total 4 naive, 2 with precomputed ipad/opad midstates."
+  source: grindstone-agentA
+  source_url: "local: scratchpad/agentA/scripts/calc.py"
+  location: "calc.py output"
+  date: 2026-10-22
+  value: {naive: 4, with_midstates: 2}
+  confidence: H
+  verified_by_us: false
+  tags: [prf_msg, ambiguity4, our_computation]
+
+- id: A-022
+  statement: "Per-attempt compressions under FIPS-205-faithful SHA-256 layouts (M = 32 B): FORS+C R-grind 6 (8 naive HMAC); FORS+C counter-in-inner-H_msg 3; PORS+FP R-grind with 512-bit H_msg 7; WOTS+C 1. REPO assumes 4 for both FORS+C and PORS+FP."
+  source: grindstone-agentA
+  source_url: "local: kb/raw/A/pseudocode.md §5"
+  location: "pseudocode.md §5"
+  date: 2026-10-22
+  value: {fors_c_R: 6, fors_c_R_naive_hmac: 8, fors_c_ctr: 3, pors_fp_R_512: 7, wots_c: 1, repo_model: 4}
+  confidence: H
+  verified_by_us: false
+  tags: [cost_model, decision, ambiguity4]
+
+- id: A-023
+  statement: "KN chose to sample new randomness per grinding attempt: H_msg(PK.seed, PK.root, R, m) with R = PRF_msg(SK.prf, opt, m, counter); alternative counter in H_msg stores the counter in the signature but needs fewer hash calls."
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: "§9.2 p.21; §11 p.26"
+  date: 2025-12-05
+  value: {chosen: "counter in PRF_msg"}
+  confidence: H
+  verified_by_us: false
+  tags: [fors_c, pors_fp, layout]
+
+- id: A-024
+  statement: "SPHINCS+C implemented FORS+C by adding 'an extra 4 bytes counter value at the end of the first hashing of the message'; code: SHAKE256(R || PK || M || ctr_BE4), counter starting at 1, stored right after R in the signature."
+  source: sphincs-c-2022
+  source_url: https://eprint.iacr.org/2022/778.pdf
+  location: "§7.1 p.18; code ref/hash_shake.c hash_with_counter(), ref/counters.c FORS_COUNTER_OFFSET = SPX_N"
+  date: 2022-09-14
+  value: {counter_bytes: 4, position: "end of first message hash", endianness: big, first_counter: 1}
+  confidence: H
+  verified_by_us: false
+  tags: [fors_c, ctr_layout]
+
+- id: A-025
+  statement: "KN Table 1/2 sizes use |R| = 32 bytes (KN: 'PRF_msg output to be 256 bits'); REPO changed randomness_size from 32 to 16 in commit 31e2cdb (2026-06-24). Hand check: W+C F+C 2^30 (32,4,14,10,w256) = 3744 B in KN Table 1 vs 3728 B from REPO compute_size formula with R = 16."
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: "KN §13 p.31 and Table 1 p.37; REPO git log -G'randomness_size = ' costs.sage"
+  date: 2025-12-05
+  value: {kn_R_bytes: 32, repo_R_bytes: 16, repo_change_commit: 31e2cdb, kn_size_example: 3744, repo_size_example_hand: 3728}
+  confidence: H
+  verified_by_us: false
+  tags: [params, size, conflict]
+
+- id: A-026
+  statement: "KN Algorithm 1 (hash to random subset): y = H(s, m); tau = first h bits; split last n-h bits into floor((n-h)/ceil(log2 t)) blocks; add blocks < t until |X| = k; if |X| < k retry with new salt; return sorted X."
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: "§10, Algorithm 1, p.25"
+  date: 2025-12-05
+  value: {algorithm: "Algorithm 1"}
+  confidence: H
+  verified_by_us: false
+  tags: [pors_fp, sampling]
+
+- id: A-027
+  statement: "KN: for PORS+FP a 512-bit H_msg output 'on expectation should be sufficient'; propose e.g. SHA-512; tables assume a single invocation always suffices and approximate it by 2 compressions."
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: "§13.3, p.36"
+  date: 2025-12-05
+  value: {output_bits: 512, assumed_compressions: 2}
+  confidence: H
+  verified_by_us: false
+  tags: [pors_fp, hmsg]
+
+- id: A-028
+  statement: "With a 512-bit H_msg and Algorithm 1, P(>= k distinct valid indices) for REPO P+FP rows: 1.000000 (44,4,16,8), 0.998608 (40,5,14,11), 0.992219 (36,3,14,9), 0.987414 (33,3,15,9), 0.996361 (32,4,14,10), 1.000000 (24,2,16,8), 0.993520 (20,2,15,10); expected tries should be divided by this factor."
+  source: grindstone-agentA
+  source_url: "local: scratchpad/agentA/scripts/calc.py"
+  location: "calc.py DP output"
+  date: 2026-10-22
+  value: {p_44_4_16_8: 1.0, p_40_5_14_11: 0.998608, p_36_3_14_9: 0.992219, p_33_3_15_9: 0.987414, p_32_4_14_10: 0.996361, p_24_2_16_8: 1.0, p_20_2_15_10: 0.993520}
+  confidence: M
+  verified_by_us: false
+  tags: [pors_fp, model, our_computation]
+
+- id: A-029
+  statement: "PORS+FP tree is left-filled with height ceil(log2 t), s = t - 2^(height-1); leaves i < 2s at the bottom level, leaves i >= 2s at level 1 as node i - s (REPO octopus_pmf.pmf_leftfilled; shrincs-cpp pors_octopus)."
+  source: spx-params-repo
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed/octopus_pmf.py
+  location: "octopus_pmf.py pmf_leftfilled(); shrincs-cpp src/pors_fp.cpp pors_octopus()"
+  date: 2026-08-26
+  value: {t: "k*2^a"}
+  confidence: H
+  verified_by_us: false
+  tags: [pors_fp, octopus]
+
+- id: A-030
+  statement: "Our Octopus auth-set-size pseudocode (pseudocode.md §4) equals a brute-force minimal-authentication-set count on 2,400 random cases (t in {8,9,12,100,147456,163840,180224,524288}, k <= 12)."
+  source: grindstone-agentA
+  source_url: "local: scratchpad/agentA/scripts/octo_check.py"
+  location: "octo_check.py output 'ok'"
+  date: 2026-10-22
+  value: {cases: 2400, mismatches: 0}
+  confidence: H
+  verified_by_us: false
+  tags: [pors_fp, octopus, our_computation]
+
+- id: A-031
+  statement: "shrincs-cpp (WIP) PORS+FP differs from KN Algorithm 1: PRF_msg is plain SHA-256(sk_prf||pk_seed||opt_rand||ctr(host-endian 4B)||M||i_BE4) not HMAC, R is 32 bytes, digest uses an uncompressed 32-byte ADRS, and indices come from a separate SHA-256 counter-mode XOF with floor(256/B) candidates per block."
+  source: shrincs-cpp
+  source_url: https://github.com/BlockstreamResearch/shrincs-cpp
+  location: "src/hash.cpp prf_msg(); src/pors_fp.cpp pors_msg_to_indices(), pors_grind(); include/constants.h R_LEN = 32"
+  date: 2026-05-01
+  value: {R_LEN: 32, ctr_endianness: host}
+  confidence: H
+  verified_by_us: false
+  tags: [pors_fp, code, conflict]
+
+- id: A-032
+  statement: "SHRINCS stateless path is plain SLH-DSA (WOTS-TW + FORS; d=5, h'=9, a=13, k=10, m=24, signature 5777 B incl. 1-byte prefix); it notes SPHINCS+C or PORS+FP 'could produce stateless signatures approximately 15% smaller'."
+  source: shrincs-bip
+  source_url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+  location: "SHRINCS.md 'Stateless Parameters' and 'Why not use a SPHINCS+ variant with smaller signatures...'"
+  date: 2026-10-18
+  value: {d: 5, h_prime: 9, a: 13, k: 10, m: 24, sl_sig_bytes: 5777, size_saving_claim_pct: 15}
+  confidence: H
+  verified_by_us: false
+  tags: [shrincs, context]
+
+- id: A-033
+  statement: "SHRINCS H_msg_sl = sha256(R || pk_seed || sha256(R || pk_seed || sl_root || M) || zeros(4)), stated to match the first FIPS 205 MGF1-SHA-256 block; confirms FIPS byte order R-first (resolves ambiguity 5)."
+  source: shrincs-bip
+  source_url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+  location: "SHRINCS.md l.1085 (H_msg_sl) and following note"
+  date: 2026-10-18
+  value: {order: "R||PK.seed||..."}
+  confidence: H
+  verified_by_us: false
+  tags: [hmsg, ambiguity5]
+
+- id: A-034
+  statement: "SHRINCS notes PRF_msg_sl may be replaced with an XOF (e.g. MGF1-SHA-256) from which the caller samples multiple randomizers for grinding more efficiently."
+  source: shrincs-bip
+  source_url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+  location: "SHRINCS.md l.1142 (Implementation Notes)"
+  date: 2026-10-18
+  value: {option: "XOF-based R sampling"}
+  confidence: H
+  verified_by_us: false
+  tags: [prf_msg, layout, future]
+
+- id: A-035
+  statement: "Abri-Katz PORS-FP tooling counts a 4-byte counter in the PORS+FP signature size (spx_fp_signature_size adds +4), whereas REPO compute_size for W+C_P+FP adds no counter (R-grinding)."
+  source: abri-pors-fp
+  source_url: https://github.com/MehdiAbri/PORS-FP
+  location: "src/core.py spx_fp_signature_size(); REPO costs.sage compute_size()"
+  date: 2025-11-13
+  value: {abri_counter_bytes: 4, repo_counter_bytes: 0}
+  confidence: H
+  verified_by_us: false
+  tags: [pors_fp, size, conflict]
+
+- id: A-036
+  statement: "GRINDSTONE v1 R-grind PRF input: HMAC-SHA-256(SK.prf, opt_rand(=PK.seed) || M || toByte(i,4)) truncated to 16 B, i from 0; FORS+C ctr-grind: counter appended (4 B BE, from 0) to M inside the inner SHA-256 of H_msg. Both are GRINDSTONE choices; no source fixes these bytes."
+  source: grindstone-agentA
+  source_url: "local: kb/raw/A/pseudocode.md §2-3"
+  location: "pseudocode.md §2, §3"
+  date: 2026-10-22
+  value: {prf_ctr_position: "after M", ctr_bytes: 4, endianness: big, first: 0}
+  confidence: M
+  verified_by_us: false
+  tags: [fors_c, pors_fp, decision, our_choice]

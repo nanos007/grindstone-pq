@@ -1,0 +1,13 @@
+id: blockstream-hww-blog-2026
+title: Are Hardware Wallets Ready to Produce Post-Quantum Signatures?
+authors:
+- Blockstream Team
+venue: Blockstream blog
+date: 2026-08-19
+url: https://blog.blockstream.com/hardware-wallets-post-quantum-signatures/
+type: news
+trust: secondary
+notes: First-party benchmark publication by Blockstream Research; reviewers include
+  Jonas Nick and Mike Kudinov. Treat the numbers as the authors' measurements, not
+  as peer-reviewed. Means only, over 100 runs; no tails. Uses the same reference C
+  library on every device.

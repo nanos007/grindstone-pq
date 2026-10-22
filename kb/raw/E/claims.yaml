@@ -1,0 +1,122 @@
+# Agent E claims (schema per project plan §3.3). Fetched 2026-10-22.
+# bips master c0c5aea; bitcoin/bitcoin master f655a8d.
+- id: E-001
+  statement: "Transaction weight = base size * 3 + total size; virtual size = weight / 4 rounded up."
+  source: bip-0141
+  location: "BIP-141, Transaction size calculations (mediawiki l.140-142)"
+  value: {witness_scale_factor: 4, nonwitness_wu_per_byte: 4, witness_wu_per_byte: 1}
+  confidence: H
+  verified_by_us: false
+  tags: [weight, consensus]
+- id: E-002
+  statement: "P2MR control block is 1 + 32*m bytes (no internal key), m in 0..128; P2TR is 33 + 32*m."
+  source: bip-0360
+  location: "BIP-360 v0.12.1, Rationale l.153 and Script Validation l.242, l.259"
+  value: {p2mr_cb: "1+32m", p2tr_cb: "33+32m", m_max: 128}
+  confidence: H
+  verified_by_us: false
+  tags: [p2mr, control-block, weight]
+- id: E-003
+  statement: "P2MR script trees of depth 0 are anyone-can-spend; depth >= 1 is encouraged."
+  source: bip-0360
+  location: "BIP-360 l.155, l.171, l.260"
+  value: {min_practical_depth: 1}
+  confidence: H
+  verified_by_us: false
+  tags: [p2mr]
+- id: E-004
+  statement: "P2MR depth-1 witness with a 64-byte Schnorr sig and <PUSH32 pk> OP_CHECKSIG leaf is 135 bytes; general case 103 + 32*m; 32 bytes smaller than P2TR script path (34 at m=7)."
+  source: bip-0360
+  location: "BIP-360 Transaction Size and Fees, l.278-310"
+  value: {depth1_witness_bytes: 135, general: "103+32m"}
+  confidence: H
+  verified_by_us: true
+  tags: [p2mr, weight, reproduced-in-tests]
+- id: E-005
+  statement: "P2MR output is SegWit v2: OP_2 OP_PUSHBYTES_32 <merkle root> (34-byte scriptPubKey), bc1z addresses."
+  source: bip-0360
+  location: "BIP-360 l.205-230"
+  value: {spk_bytes: 34, witness_version: 2}
+  confidence: H
+  verified_by_us: false
+  tags: [p2mr, output]
+- id: E-006
+  statement: "Tapscript keeps the 520-byte maximum stack element size for both the initial stack and push opcodes."
+  source: bip-0342
+  location: "BIP-342 Resource limits, l.132; Bitcoin Core src/script/script.h MAX_SCRIPT_ELEMENT_SIZE = 520"
+  value: {max_element_bytes: 520}
+  confidence: H
+  verified_by_us: false
+  tags: [limits, consensus, tapscript]
+- id: E-007
+  statement: "OP_SUCCESSx precedes the size check of the initial stack, so an OP_SUCCESSx-derived opcode requiring stack elements bigger than 520 bytes may uplift the limit in a softfork."
+  source: bip-0342
+  location: "BIP-342 l.59 and l.63; interpreter.cpp ExecuteWitnessScript comment 'OP_SUCCESSx processing overrides everything, including stack element size limits'"
+  value: {pq_sig_over_520_requires: "OP_SUCCESSx-derived opcode or new leaf version"}
+  confidence: H
+  verified_by_us: false
+  tags: [limits, pq-opcode, softfork]
+- id: E-008
+  statement: "Policy: witness stack items in standard leaf-0xc0 tapscript spends are limited to 80 bytes; annexes are non-standard."
+  source: bitcoin-core
+  location: "src/policy/policy.h MAX_STANDARD_TAPSCRIPT_STACK_ITEM_SIZE{80}; policy.cpp IsWitnessStandard"
+  value: {max_standard_tapscript_item: 80}
+  confidence: H
+  verified_by_us: false
+  tags: [policy, limits]
+- id: E-009
+  statement: "BIP-360 authors plan PQ signature verification (ML-DSA, SLH-DSA) by redefining OP_SUCCESSx opcodes; no new tapleaf version needed. BIP-360 changelog 0.8.0: PQ support via opcodes or leaf version."
+  source: delving-bip360-changes-2025-07-07
+  location: "delvingbitcoin.org/t/changes-to-bip-360-pay-to-quantum-resistant-hash-p2qrh/1811 post #1 (E. Heilman); BIP-360 changelog l.429"
+  value: {mechanism: OP_SUCCESSx}
+  confidence: M
+  verified_by_us: false
+  tags: [pq-opcode, plan]
+- id: E-010
+  statement: "Tapscript sigops budget per input = 50 + serialized witness size; each executed signature opcode with non-empty signature costs 50."
+  source: bip-0342
+  location: "BIP-342 Resource limits l.130"
+  value: {budget: "50 + witness_bytes", cost_per_sigop: 50}
+  confidence: H
+  verified_by_us: false
+  tags: [limits, sigops]
+- id: E-011
+  statement: "Mainnet tx 37777defed8717c581b4c0509329550e344bdc14ac38f71fc050096887e535c8 (P2TR key-path + script-path inputs) has size 358, weight 727, vsize 182; script-path witness items 64/34/65 bytes (167 B serialized)."
+  source: mempool.space-api, blockstream.info-api
+  location: "/api/tx/37777def...e535c8 (block 709635)"
+  value: {size: 358, weight: 727, vsize: 182}
+  confidence: H
+  verified_by_us: true
+  tags: [sanity-check, p2tr, reproduced-in-tests]
+- id: E-012
+  statement: "Mainnet tx 6fb976ab49dcec017f1e201e84395983204ae1a7c2abf7ced0a85d692e442799 (P2TR script path, 853-byte leaf) has size 1040, weight 1286, vsize 322."
+  source: mempool.space-api, blockstream.info-api
+  location: "/api/tx/6fb976ab...442799 (block 767430)"
+  value: {size: 1040, weight: 1286, vsize: 322}
+  confidence: H
+  verified_by_us: true
+  tags: [sanity-check, p2tr, reproduced-in-tests]
+- id: E-013
+  statement: "Derived (GRINDSTONE model): P2MR depth-1 PQ input witness = sig + 73 bytes for sig >= 253 B with a 32-byte pubkey; a 1-in-2-out all-P2MR spend is 938 / 1016 / 1165 / 237 vB for 3128 / 3440 / 4036 / 324-byte signatures."
+  source: grindstone-kb-fees
+  location: "kb/fees.py pq_input_witness_bytes, tx_vbytes"
+  value: {witness_overhead_bytes: 73, vsize: {3128: 938, 3440: 1016, 4036: 1165, 324: 237}}
+  confidence: M
+  verified_by_us: false
+  tags: [derived, fees, rq4]
+- id: E-014
+  statement: "Derived: per input, each signature byte costs 0.25 vB; vs 324-B SHRINCS, 3128/3440/4036-B sigs cost +701/+779/+928 vB = 7010/7790/9280 sats at 10 sat/vB."
+  source: grindstone-kb-fees
+  location: "kb/fees.py delta_table"
+  value: {d_vb_vs_324: {3128: 701, 3440: 779, 4036: 928}, d_sats_10: {3128: 7010, 3440: 7790, 4036: 9280}}
+  confidence: M
+  verified_by_us: false
+  tags: [derived, fees, rq4]
+- id: E-015
+  statement: "No merged BIP defines a special witness discount for post-quantum signatures; PQ signature bytes weigh 1 WU each like any witness data."
+  source: bip-0141, bip-0360
+  location: "BIP-141 weight definition; BIP-360 v0.12.1 full text (no discount)"
+  value: {pq_witness_wu_per_byte: 1}
+  confidence: M
+  verified_by_us: false
+  tags: [weight, open-question]

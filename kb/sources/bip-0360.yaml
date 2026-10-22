@@ -1,0 +1,13 @@
+id: bip-0360
+title: 'BIP 360: Pay-to-Merkle-Root (P2MR)'
+authors:
+- Hunter Beast
+- Ethan Heilman
+- Isabel Foxen Duke
+venue: bitcoin/bips GitHub repository
+date: 2026-02-11
+url: https://github.com/bitcoin/bips/blob/master/bip-0360.mediawiki
+type: standard
+trust: primary
+notes: 'Merged in commit eae7d9fc57 (PR #1670) on 2026-02-11T21:01:47Z. Status Draft,
+  Version 0.12.1 at fetch time. Latest file commit e7263a4cfe (2026-08-03).'

@@ -1,0 +1,2279 @@
+count: 145
+claims:
+- id: A-001
+  statement: FIPS 205 SHA2 category-1 H_msg is MGF1-SHA-256(R || PK.seed || SHA-256(R || PK.seed || PK.root || M), m).
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: §11.2.1, p.45
+  date: 2024-08-13
+  value:
+    construction: MGF1-SHA-256 over R||PK.seed||SHA-256(R||PK.seed||PK.root||M)
+  confidence: H
+  verified_by_us: false
+  tags:
+  - hmsg
+  - sha2
+  - spec
+  agent: A
+- id: A-002
+  statement: FIPS 205 SHA2 category-1 PRF_msg is Trunc_n(HMAC-SHA-256(SK.prf, opt_rand || M)); F/H/T_l/PRF prepend PK.seed
+    || toByte(0, 64-n) then the 22-byte ADRSc.
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: §11.2.1, p.45-46
+  date: 2024-08-13
+  value:
+    prf_msg: Trunc_n(HMAC-SHA-256(SK.prf, opt_rand||M))
+    pkseed_pad_bytes: 48
+  confidence: H
+  verified_by_us: false
+  tags:
+  - prf_msg
+  - sha2
+  - spec
+  agent: A
+- id: A-003
+  statement: 'Compressed address ADRSc = ADRS[3] || ADRS[8:16] || ADRS[19] || ADRS[20:32] (22 bytes: layer 1, tree 8, type
+    1, 12 payload).'
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: §11.2, Figure 18, Table 3, p.45
+  date: 2024-08-13
+  value:
+    adrsc_bytes: 22
+  confidence: H
+  verified_by_us: false
+  tags:
+  - adrs
+  - spec
+  agent: A
+- id: A-004
+  statement: base_2b returns the first out_len*b bits of X as integers, reading bytes in big-endian bit order (MSB first).
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: §4.4, Algorithm 4, p.15-16
+  date: 2024-08-13
+  value:
+    bit_order: MSB-first
+  confidence: H
+  verified_by_us: false
+  tags:
+  - encoding
+  - spec
+  agent: A
+- id: A-005
+  statement: 'SLH-DSA digest split: md = digest[0:ceil(k*a/8)], then ceil((h-h/d)/8) bytes idx_tree, then ceil(h/(8d)) bytes
+    idx_leaf; fors_sign uses base_2b(md, a, k), tree i <- indices[i].'
+  source: fips205
+  source_url: https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.205.pdf
+  location: §9.2 Algorithm 19 lines 6-10, p.34-35; §8 Algorithm 16, p.30; m formula §9, p.33
+  date: 2024-08-13
+  value:
+    m_formula: ceil((h-h')/8) + ceil(k*a/8) + ceil(h'/8)
+  confidence: H
+  verified_by_us: false
+  tags:
+  - digest
+  - fors
+  - spec
+  agent: A
+- id: A-006
+  statement: KN define the WOTS+C digest as d = Th(P, T*, m||count), count in {0,1}^r, without fixing tweak type value, counter
+    width or endianness.
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: §5, p.11-12
+  date: 2025-12-05
+  value:
+    form: Th(P, T*_adrs, m||count)
+  confidence: H
+  verified_by_us: false
+  tags:
+  - wots_c
+  - ambiguity3
+  agent: A
+- id: A-007
+  statement: 'KN state the zero-chain condition as ''forall i in [w-1-z+1, w-1]: a_i = 0'' and omit ''the last z chains'';
+    SPHINCS+C states ''forall i in [z]: a_i = 0'' (first z chains). Sources conflict; GRINDSTONE v1 uses z = 0.'
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: KN §5 p.11-12 + footnote 3; SPHINCS+C §3 p.4-5 Alg.6 l.5
+  date: 2025-12-05
+  value:
+    kn_range: '[w-1-z+1, w-1]'
+    sphincs_c_range: '[z]'
+    grindstone_z: 0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - wots_c
+  - ambiguity2
+  - conflict
+  agent: A
+- id: A-008
+  statement: WOTS+C success probability with optional z_b zero bits is p = nu / (w^l * 2^z_b); tail P(T > k) = (1 - p)^k.
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: §5.1, p.13-14, eq. (1)
+  date: 2025-12-05
+  value:
+    formula: nu/(w^l*2^z_b)
+  confidence: H
+  verified_by_us: false
+  tags:
+  - wots_c
+  - model
+  agent: A
+- id: A-009
+  statement: 'Recomputed WOTS+C expected tries per layer: 65.7 (w=16,S=240), 1335.3 (w=16,S=304), 748.0 (w=256,S=2040), 30143.4
+    (w=256,S=2840); Python smoke test of the v1 layout gave mean 65.85 over 2000 samples for w=16,S=240.'
+  source: grindstone-agentA
+  source_url: 'local: scratchpad/agentA/scripts/calc.py, smoke.py'
+  location: calc.py output; smoke.py output
+  date: 2026-10-22
+  value:
+    E_16_240: 65.7
+    E_16_304: 1335.3
+    E_256_2040: 748.0
+    E_256_2840: 30143.4
+    smoke_mean_16_240: 65.85
+    smoke_n: 2000
+  confidence: H
+  verified_by_us: false
+  tags:
+  - wots_c
+  - model
+  - our_computation
+  agent: A
+- id: A-010
+  statement: SPHINCS+C reference code puts the WOTS+C counter inside the address (new type 7 'WOTS+C message compression',
+    4-byte big-endian counter at ADRS byte offset 24), hashes only the root, and starts counting at 1 (0 = not found).
+  source: sphincs-c-code
+  source_url: https://github.com/eyalr0/sphincsplusc
+  location: ref/address.h l.14 (SPX_ADDR_TYPE_COMPRESS_WOTS 7); ref/shake_offsets.h l.18 (SPX_OFFSER_COUNTER 24); ref/merkle.c
+    wots counter loop; paper §7.2 p.19
+  date: 2022-06-18
+  value:
+    type: 7
+    counter_bytes: 4
+    counter_offset_in_adrs32: 24
+    endianness: big
+    first_counter: 1
+  confidence: H
+  verified_by_us: false
+  tags:
+  - wots_c
+  - ambiguity3
+  - code
+  agent: A
+- id: A-011
+  statement: 'SHRINCS stateful WOTS+C grind: H_grind = sha256(pk_seed || zeros(48) || ADRS[:10] || digest(32) || zeros(4)
+    || counter.to_bytes(2))[:16], ADRS type SF_WOTS_C_GRIND = 22, 16-bit big-endian counter, lowest valid counter, at most
+    2^16 tries; extra 4 zero bytes align the counter to a SHA-256 schedule word.'
+  source: shrincs-bip
+  source_url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+  location: SHRINCS.md l.621 (ADRS types), l.933-938 (H_grind), l.1546-1561 (wots_c_grind_to_constant_sum)
+  date: 2026-10-18
+  value:
+    type: 22
+    counter_bits: 16
+    endianness: big
+    max_tries: 65536
+    adrs_bytes_hashed: 10
+    claimed_fail_log2: -1450
+  confidence: H
+  verified_by_us: false
+  tags:
+  - wots_c
+  - ambiguity3
+  - shrincs
+  agent: A
+- id: A-012
+  statement: A 16-bit WOTS+C counter (SHRINCS) would fail with ~11% probability per layer for w=256, S=2840 (p = 3.317e-5,
+    (1-p)^65536 ~ e^-2.17); 4-byte counters (REPO counter_size = 4) are needed for high-S rows.
+  source: grindstone-agentA
+  source_url: 'local: scratchpad/agentA/scripts/calc.py'
+  location: derived from A-009 p values
+  date: 2026-10-22
+  value:
+    p: 3.31747e-05
+    fail_prob_16bit: 0.11
+  confidence: H
+  verified_by_us: false
+  tags:
+  - wots_c
+  - counter_width
+  - our_computation
+  agent: A
+- id: A-013
+  statement: 'GRINDSTONE v1 WOTS+C layout: second SHA-256 block = ADRSc*(type 7, layer, tree, keypair=leaf, 8 zero bytes)
+    || m(16) || count(4, BE) = 42 bytes + padding (bit length 848), i.e. exactly 1 compression after the cached PK.seed midstate.'
+  source: grindstone-agentA
+  source_url: 'local: kb/raw/A/pseudocode.md §1'
+  location: pseudocode.md §1
+  date: 2026-10-22
+  value:
+    block2_payload_bytes: 42
+    msg_bitlen: 848
+    compressions_per_attempt: 1
+    adrs_type: 7
+    counter_bytes: 4
+  confidence: H
+  verified_by_us: false
+  tags:
+  - wots_c
+  - decision
+  - our_choice
+  agent: A
+- id: A-014
+  statement: 'KN FORS+C: force the last tree to open the first leaf, ''equivalent to requiring that the last a bits of the
+    digest of the message that is signed by FORS are all zeros''.'
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: §9.2, p.21
+  date: 2025-12-05
+  value:
+    condition: last tree index = 0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - fors_c
+  - ambiguity1
+  agent: A
+- id: A-015
+  statement: 'SPHINCS+C text conflicts on position: §4.1 says the digest ''ends with b bits of zero'', §7.1 says ''until the
+    first t'' bits ... are zero''; the SHAKE reference code checks a dedicated zero field at the front of the H_msg output
+    (low SPX_FORS_ZERO_LAST_BITS bits of the first ceil(Z/8) bytes), separate from the FORS message bytes.'
+  source: sphincs-c-2022
+  source_url: https://eprint.iacr.org/2022/778.pdf
+  location: §4.1 p.8; §7.1 p.18; code ref/hash_shake.c hash_message()
+  date: 2022-09-14
+  value:
+    paper_41: last
+    paper_71: first
+    code: prefix field
+  confidence: H
+  verified_by_us: false
+  tags:
+  - fors_c
+  - ambiguity1
+  - conflict
+  agent: A
+- id: A-016
+  statement: 'GRINDSTONE v1 FORS+C acceptance: base_2b(md, a, k)[k-1] == 0, i.e. digest bits [(k-1)a, ka) (MSB-first) are
+    zero; e.g. for 2^30 (h=32,d=4,a=14,k=10) bits [126,140): d[15]&0x03, d[16]&0xFF, d[17]&0xF0 must be 0.'
+  source: grindstone-agentA
+  source_url: 'local: kb/raw/A/pseudocode.md §0'
+  location: pseudocode.md §0 table
+  date: 2026-10-22
+  value:
+    bits: '[(k-1)a, ka)'
+    example_2_30: d[15]&0x03 d[16]&0xFF d[17]&0xF0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - fors_c
+  - decision
+  agent: A
+- id: A-017
+  statement: 'FIPS 205 m (bytes) for REPO F+C/P+FP rows: 23 (44,4,16,8), 25 (40,5,14,11), 21 (36,3,14,9), 22 (33,3,15,9),
+    22 (32,4,14,10), 20 (24,2,16,8), 23 (20,2,15,10); all <= 32, so one MGF1-SHA-256 output block.'
+  source: grindstone-agentA
+  source_url: 'local: scratchpad/agentA/scripts/calc.py'
+  location: calc.py output
+  date: 2026-10-22
+  value:
+    m_44_4_16_8: 23
+    m_40_5_14_11: 25
+    m_36_3_14_9: 21
+    m_33_3_15_9: 22
+    m_32_4_14_10: 22
+    m_24_2_16_8: 20
+    m_20_2_15_10: 23
+  confidence: H
+  verified_by_us: false
+  tags:
+  - hmsg
+  - params
+  - our_computation
+  agent: A
+- id: A-018
+  statement: 'REPO models C_Hmsg = 2 (''Message hash: PKseed + PKroot (128) + R (256) + m (256)'') and C_PRFmsg = 2 (''SKprf
+    (128) + Opt + m (256) + counter''); FORS+C/PORS+FP grind attempt cost = C_Hmsg + C_PRFmsg = 4.'
+  source: spx-params-repo
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed/costs.sage
+  location: costs.sage l.61-62, l.432 (c_msg), l.342 (fors_c_expected_search_time)
+  date: 2026-08-26
+  value:
+    C_Hmsg: 2
+    C_PRFmsg: 2
+    per_attempt: 4
+  confidence: H
+  verified_by_us: false
+  tags:
+  - hmsg
+  - cost_model
+  - ambiguity4
+  agent: A
+- id: A-019
+  statement: KN state that signing a 256-bit digest 'results in two compression function calls for H_msg'.
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: §13.2, p.35-36
+  date: 2025-12-05
+  value:
+    hmsg_compressions_claimed: 2
+  confidence: H
+  verified_by_us: false
+  tags:
+  - hmsg
+  - cost_model
+  - ambiguity4
+  agent: A
+- id: A-020
+  statement: 'Under FIPS 205 SHA2 H_msg with M = 32 bytes, n = 16: inner SHA-256 over 80 B = 2 compressions, one MGF1 block
+    over 68 B = 2 compressions, total 4 (also 4 with |R| = 32: 96 B and 84 B). This conflicts with A-018/A-019 (2).'
+  source: grindstone-agentA
+  source_url: 'local: scratchpad/agentA/scripts/calc.py'
+  location: blocks(L) = ceil((L+9)/64)
+  date: 2026-10-22
+  value:
+    inner_bytes: 80
+    inner_compr: 2
+    outer_bytes: 68
+    outer_compr: 2
+    total: 4
+  confidence: H
+  verified_by_us: false
+  tags:
+  - hmsg
+  - ambiguity4
+  - conflict
+  - our_computation
+  agent: A
+- id: A-021
+  statement: 'PRF_msg = HMAC-SHA-256 with 16-byte key over opt_rand(16)||M(32)[||ctr4]: inner 112/116 B -> 2 compressions,
+    outer 96 B -> 2; total 4 naive, 2 with precomputed ipad/opad midstates.'
+  source: grindstone-agentA
+  source_url: 'local: scratchpad/agentA/scripts/calc.py'
+  location: calc.py output
+  date: 2026-10-22
+  value:
+    naive: 4
+    with_midstates: 2
+  confidence: H
+  verified_by_us: false
+  tags:
+  - prf_msg
+  - ambiguity4
+  - our_computation
+  agent: A
+- id: A-022
+  statement: 'Per-attempt compressions under FIPS-205-faithful SHA-256 layouts (M = 32 B): FORS+C R-grind 6 (8 naive HMAC);
+    FORS+C counter-in-inner-H_msg 3; PORS+FP R-grind with 512-bit H_msg 7; WOTS+C 1. REPO assumes 4 for both FORS+C and PORS+FP.'
+  source: grindstone-agentA
+  source_url: 'local: kb/raw/A/pseudocode.md §5'
+  location: pseudocode.md §5
+  date: 2026-10-22
+  value:
+    fors_c_R: 6
+    fors_c_R_naive_hmac: 8
+    fors_c_ctr: 3
+    pors_fp_R_512: 7
+    wots_c: 1
+    repo_model: 4
+  confidence: H
+  verified_by_us: false
+  tags:
+  - cost_model
+  - decision
+  - ambiguity4
+  agent: A
+- id: A-023
+  statement: 'KN chose to sample new randomness per grinding attempt: H_msg(PK.seed, PK.root, R, m) with R = PRF_msg(SK.prf,
+    opt, m, counter); alternative counter in H_msg stores the counter in the signature but needs fewer hash calls.'
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: §9.2 p.21; §11 p.26
+  date: 2025-12-05
+  value:
+    chosen: counter in PRF_msg
+  confidence: H
+  verified_by_us: false
+  tags:
+  - fors_c
+  - pors_fp
+  - layout
+  agent: A
+- id: A-024
+  statement: 'SPHINCS+C implemented FORS+C by adding ''an extra 4 bytes counter value at the end of the first hashing of the
+    message''; code: SHAKE256(R || PK || M || ctr_BE4), counter starting at 1, stored right after R in the signature.'
+  source: sphincs-c-2022
+  source_url: https://eprint.iacr.org/2022/778.pdf
+  location: §7.1 p.18; code ref/hash_shake.c hash_with_counter(), ref/counters.c FORS_COUNTER_OFFSET = SPX_N
+  date: 2022-09-14
+  value:
+    counter_bytes: 4
+    position: end of first message hash
+    endianness: big
+    first_counter: 1
+  confidence: H
+  verified_by_us: false
+  tags:
+  - fors_c
+  - ctr_layout
+  agent: A
+- id: A-025
+  statement: 'KN Table 1/2 sizes use |R| = 32 bytes (KN: ''PRF_msg output to be 256 bits''); REPO changed randomness_size
+    from 32 to 16 in commit 31e2cdb (2026-06-24). Hand check: W+C F+C 2^30 (32,4,14,10,w256) = 3744 B in KN Table 1 vs 3728
+    B from REPO compute_size formula with R = 16.'
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: KN §13 p.31 and Table 1 p.37; REPO git log -G'randomness_size = ' costs.sage
+  date: 2025-12-05
+  value:
+    kn_R_bytes: 32
+    repo_R_bytes: 16
+    repo_change_commit: 31e2cdb
+    kn_size_example: 3744
+    repo_size_example_hand: 3728
+  confidence: H
+  verified_by_us: false
+  tags:
+  - params
+  - size
+  - conflict
+  agent: A
+- id: A-026
+  statement: 'KN Algorithm 1 (hash to random subset): y = H(s, m); tau = first h bits; split last n-h bits into floor((n-h)/ceil(log2
+    t)) blocks; add blocks < t until |X| = k; if |X| < k retry with new salt; return sorted X.'
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: §10, Algorithm 1, p.25
+  date: 2025-12-05
+  value:
+    algorithm: Algorithm 1
+  confidence: H
+  verified_by_us: false
+  tags:
+  - pors_fp
+  - sampling
+  agent: A
+- id: A-027
+  statement: 'KN: for PORS+FP a 512-bit H_msg output ''on expectation should be sufficient''; propose e.g. SHA-512; tables
+    assume a single invocation always suffices and approximate it by 2 compressions.'
+  source: kudinov-nick-2025
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  location: §13.3, p.36
+  date: 2025-12-05
+  value:
+    output_bits: 512
+    assumed_compressions: 2
+  confidence: H
+  verified_by_us: false
+  tags:
+  - pors_fp
+  - hmsg
+  agent: A
+- id: A-028
+  statement: 'With a 512-bit H_msg and Algorithm 1, P(>= k distinct valid indices) for REPO P+FP rows: 1.000000 (44,4,16,8),
+    0.998608 (40,5,14,11), 0.992219 (36,3,14,9), 0.987414 (33,3,15,9), 0.996361 (32,4,14,10), 1.000000 (24,2,16,8), 0.993520
+    (20,2,15,10); expected tries should be divided by this factor.'
+  source: grindstone-agentA
+  source_url: 'local: scratchpad/agentA/scripts/calc.py'
+  location: calc.py DP output
+  date: 2026-10-22
+  value:
+    p_44_4_16_8: 1.0
+    p_40_5_14_11: 0.998608
+    p_36_3_14_9: 0.992219
+    p_33_3_15_9: 0.987414
+    p_32_4_14_10: 0.996361
+    p_24_2_16_8: 1.0
+    p_20_2_15_10: 0.99352
+  confidence: M
+  verified_by_us: false
+  tags:
+  - pors_fp
+  - model
+  - our_computation
+  agent: A
+- id: A-029
+  statement: PORS+FP tree is left-filled with height ceil(log2 t), s = t - 2^(height-1); leaves i < 2s at the bottom level,
+    leaves i >= 2s at level 1 as node i - s (REPO octopus_pmf.pmf_leftfilled; shrincs-cpp pors_octopus).
+  source: spx-params-repo
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed/octopus_pmf.py
+  location: octopus_pmf.py pmf_leftfilled(); shrincs-cpp src/pors_fp.cpp pors_octopus()
+  date: 2026-08-26
+  value:
+    t: k*2^a
+  confidence: H
+  verified_by_us: false
+  tags:
+  - pors_fp
+  - octopus
+  agent: A
+- id: A-030
+  statement: Our Octopus auth-set-size pseudocode (pseudocode.md §4) equals a brute-force minimal-authentication-set count
+    on 2,400 random cases (t in {8,9,12,100,147456,163840,180224,524288}, k <= 12).
+  source: grindstone-agentA
+  source_url: 'local: scratchpad/agentA/scripts/octo_check.py'
+  location: octo_check.py output 'ok'
+  date: 2026-10-22
+  value:
+    cases: 2400
+    mismatches: 0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - pors_fp
+  - octopus
+  - our_computation
+  agent: A
+- id: A-031
+  statement: 'shrincs-cpp (WIP) PORS+FP differs from KN Algorithm 1: PRF_msg is plain SHA-256(sk_prf||pk_seed||opt_rand||ctr(host-endian
+    4B)||M||i_BE4) not HMAC, R is 32 bytes, digest uses an uncompressed 32-byte ADRS, and indices come from a separate SHA-256
+    counter-mode XOF with floor(256/B) candidates per block.'
+  source: shrincs-cpp
+  source_url: https://github.com/BlockstreamResearch/shrincs-cpp
+  location: src/hash.cpp prf_msg(); src/pors_fp.cpp pors_msg_to_indices(), pors_grind(); include/constants.h R_LEN = 32
+  date: 2026-05-01
+  value:
+    R_LEN: 32
+    ctr_endianness: host
+  confidence: H
+  verified_by_us: false
+  tags:
+  - pors_fp
+  - code
+  - conflict
+  agent: A
+- id: A-032
+  statement: SHRINCS stateless path is plain SLH-DSA (WOTS-TW + FORS; d=5, h'=9, a=13, k=10, m=24, signature 5777 B incl.
+    1-byte prefix); it notes SPHINCS+C or PORS+FP 'could produce stateless signatures approximately 15% smaller'.
+  source: shrincs-bip
+  source_url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+  location: SHRINCS.md 'Stateless Parameters' and 'Why not use a SPHINCS+ variant with smaller signatures...'
+  date: 2026-10-18
+  value:
+    d: 5
+    h_prime: 9
+    a: 13
+    k: 10
+    m: 24
+    sl_sig_bytes: 5777
+    size_saving_claim_pct: 15
+  confidence: H
+  verified_by_us: false
+  tags:
+  - shrincs
+  - context
+  agent: A
+- id: A-033
+  statement: SHRINCS H_msg_sl = sha256(R || pk_seed || sha256(R || pk_seed || sl_root || M) || zeros(4)), stated to match
+    the first FIPS 205 MGF1-SHA-256 block; confirms FIPS byte order R-first (resolves ambiguity 5).
+  source: shrincs-bip
+  source_url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+  location: SHRINCS.md l.1085 (H_msg_sl) and following note
+  date: 2026-10-18
+  value:
+    order: R||PK.seed||...
+  confidence: H
+  verified_by_us: false
+  tags:
+  - hmsg
+  - ambiguity5
+  agent: A
+- id: A-034
+  statement: SHRINCS notes PRF_msg_sl may be replaced with an XOF (e.g. MGF1-SHA-256) from which the caller samples multiple
+    randomizers for grinding more efficiently.
+  source: shrincs-bip
+  source_url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+  location: SHRINCS.md l.1142 (Implementation Notes)
+  date: 2026-10-18
+  value:
+    option: XOF-based R sampling
+  confidence: H
+  verified_by_us: false
+  tags:
+  - prf_msg
+  - layout
+  - future
+  agent: A
+- id: A-035
+  statement: Abri-Katz PORS-FP tooling counts a 4-byte counter in the PORS+FP signature size (spx_fp_signature_size adds +4),
+    whereas REPO compute_size for W+C_P+FP adds no counter (R-grinding).
+  source: abri-pors-fp
+  source_url: https://github.com/MehdiAbri/PORS-FP
+  location: src/core.py spx_fp_signature_size(); REPO costs.sage compute_size()
+  date: 2025-11-13
+  value:
+    abri_counter_bytes: 4
+    repo_counter_bytes: 0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - pors_fp
+  - size
+  - conflict
+  agent: A
+- id: A-036
+  statement: 'GRINDSTONE v1 R-grind PRF input: HMAC-SHA-256(SK.prf, opt_rand(=PK.seed) || M || toByte(i,4)) truncated to 16
+    B, i from 0; FORS+C ctr-grind: counter appended (4 B BE, from 0) to M inside the inner SHA-256 of H_msg. Both are GRINDSTONE
+    choices; no source fixes these bytes.'
+  source: grindstone-agentA
+  source_url: 'local: kb/raw/A/pseudocode.md §2-3'
+  location: pseudocode.md §2, §3
+  date: 2026-10-22
+  value:
+    prf_ctr_position: after M
+    ctr_bytes: 4
+    endianness: big
+    first: 0
+  confidence: M
+  verified_by_us: false
+  tags:
+  - fors_c
+  - pors_fp
+  - decision
+  - our_choice
+  agent: A
+- id: B-001
+  statement: Repo HEAD of BlockstreamResearch/SPHINCS-Parameters on 2026-10-22 is ceee8ed (same as the commit cited in project
+    plan 3.5).
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/commit/ceee8ed67e8b69ae2d8efd10065b5a550c330018
+  exact_location: git log -1 after clone
+  date: 2026-08-26
+  value:
+    commit: ceee8ed67e8b69ae2d8efd10065b5a550c330018
+  confidence: H
+  agent: B
+- id: B-002
+  statement: 'Headline 2^40 point: W+C P+FP, h=40 d=5 a=14 k=11 w=256 S=2040, 4036 bytes (bold row).'
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: Sec. 13, Table 1 (2^40 block, W+C P+FP, bold row); p.37
+  date: 2025-12-08
+  value:
+    sig_bytes: 4036
+    sig_limit_log2: 40
+    m_max: 118
+    exp_search_hashes: 23e4
+    wc_search_hashes: 462e4
+    verify_compr: 10559
+  reproduced:
+    sig_bytes: 4036
+    m_max: 118
+    exp_search_hashes: 225017
+    wc_search_hashes: 4624791
+    verify_compr_uncached: 10559
+    profile: R=32B, uncached
+  confidence: H
+  agent: B
+- id: B-003
+  statement: 'Headline 2^30 point: W+C P+FP, h=32 d=4 a=14 k=10 w=256 S=2040, 3440 bytes (bold row).'
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: Sec. 13, Table 1 (2^30 block, W+C P+FP, bold row)
+  date: 2025-12-08
+  value:
+    sig_bytes: 3440
+    sig_limit_log2: 30
+    m_max: 106
+    exp_search_hashes: 20e4
+    wc_search_hashes: 411e4
+    verify_compr: 8472
+  reproduced:
+    sig_bytes: 3440
+    m_max: 106
+    exp_search_hashes: 199470
+    wc_search_hashes: 4107396
+  confidence: H
+  agent: B
+- id: B-004
+  statement: 'The ~3128 B @2^20 figure is Table 2''s W+C P+FP row h=24 d=2 a=16 k=8 w=16 S=240 (not bold). Table 2 also lists
+    a SMALLER 2^20 row: W+C P+FP h=20 d=2 a=15 k=10 w=256 S=2040 at 2856 B.'
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: Sec. 13, Table 2 (2^20)
+  date: 2025-12-08
+  value:
+    row_3128:
+      h: 24
+      d: 2
+      a: 16
+      k: 8
+      w: 16
+      S: 240
+      m_max: 97
+      sig_bytes: 3128
+    row_2856:
+      h: 20
+      d: 2
+      a: 15
+      k: 10
+      w: 256
+      S: 2040
+      m_max: 114
+      sig_bytes: 2856
+  confidence: H
+  note: 'Project plan 1.1 quotes 3,128 B for 2^20; the paper''s smallest 2^20 point is 2,856 B (heavier verify: 4372 compr,
+    1.53 compr/B).'
+  agent: B
+- id: B-005
+  statement: All sizes in KN Tables 1-2 use 32-byte randomness R; repo HEAD uses R = 16 bytes, so every repo size is exactly
+    16 B smaller (4036->4020, 3440->3424, 3128->3112).
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: costs.sage:40 randomness_size = 16; KN Sec. 13 'PRF_msg output to be 256 bits'; tests/fixtures.json variants
+    (W+C_P+FP|40,5,11,14,256,2040 size 4020)
+  date: 2026-08-26
+  value:
+    paper_R_bytes: 32
+    repo_R_bytes: 16
+    delta_bytes: 16
+  confidence: H
+  agent: B
+- id: B-006
+  statement: KN Tables 1-2 compression counts use the original 'uncached' convention (Th2 = 2 compressions); repo HEAD defaults
+    to 'cached' (PK.seed midstate, Th2 = 1, ADRS_c 22 B). Hash-call counts and grind counts are convention-independent.
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: costs.sage:42-74; KN Table 1 SPX row verify 2387 compr (uncached) vs repo fixtures baseline sv 2155 (cached)
+  date: 2026-08-26
+  confidence: H
+  agent: B
+- id: B-007
+  statement: All 29 W+C / W+C F+C / W+C P+FP rows + SPX row of KN Tables 1-2 reproduce exactly in size, verify hashes, verify
+    compressions, expected search and 2^-30 worst-case search (paper rounding) with costs.py under (R=32, uncached).
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: Tables 1-2; grindstone/tests/test_costs.py::test_paper_tables_full_row
+  date: 2026-10-22
+  confidence: H
+  agent: B
+- id: B-008
+  statement: WOTS+C success probability p = nu / w^len1 (times 2^-z_b), nu = sum_j (-1)^j C(l,j) C(S+l-jw-1, l-1); expected
+    tries 1/p per layer; tail P(T>k) = (1-p)^k.
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: Sec. 5.1, eq. (1); costs.sage:184-205, 409-411
+  date: 2025-12-08
+  confidence: H
+  agent: B
+- id: B-009
+  statement: 'WOTS+C expected tries per layer: w=16,len1=32: S=240 -> 65.7, S=304 -> 1335; w=256,len1=16: S=2040 -> 748, S=2840
+    -> 30143.'
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: costs.sage:409-410 (formula); values computed by grindstone/ref/costs.py wots_c_expected_tries; consistent
+    with KN Table 1 Exp. Search (e.g. 264 = 4*ceil(65.7), 3745 = 5*ceil(748.x), 15e4 = 5*30144)
+  date: 2026-10-22
+  value:
+    w16_S240: 65.7
+    w16_S304: 1335
+    w256_S2040: 748
+    w256_S2840: 30143
+  confidence: H
+  agent: B
+- id: B-010
+  statement: 'WOTS+C zero-chains: the last z chains are omitted (l = len1 - z) if their digits are 0; the paper writes the
+    index range as [w-1-z+1, w-1], which looks like a typo for [len1-z+1, len1]. The repo never uses z (z = 0 everywhere).'
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: Sec. 5, condition 2 and Verify step 5
+  date: 2025-12-08
+  confidence: M
+  note: GRINDSTONE models p(z) = nu(len1-z, S, w)/w^len1 (brute-force checked in tests). Paper's p_nu = nu/(w^l 2^z_b) is
+    ambiguous on whether w^l uses l=len1-z; we use len1.
+  agent: B
+- id: B-011
+  statement: 'FORS+C: last tree forced to open leaf 0 (last a digest bits zero); expected 2^a attempts; costs.sage charges
+    C_Hmsg + C_PRFmsg = 4 compressions (2 ''hashes'') per attempt and models R-regeneration (counter in PRF_msg).'
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: costs.sage:435-456, 61-62; KN Sec. 9.2
+  date: 2026-08-26
+  confidence: H
+  agent: B
+- id: B-012
+  statement: 'PORS+FP m_max is not a free parameter in the repo: compute_mmax picks the smallest m_max (starting at (k-1)a
+    - 22) whose expected signing compressions are < 1.11x the FORS+C signing time for the same (h,d,k,a,w).'
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: costs.sage:331-358
+  date: 2026-08-26
+  confidence: H
+  agent: B
+- id: B-013
+  statement: PORS+FP expected tries = 1 / P(|Octopus set| <= m_max) from the exact Abri-Katz PMF; the repo ceil()s the attempt
+    count; the 2^-30 worst case is worst_case(1/ceil(E), 2^-30, 1); the paper assumes one hash suffices to obtain k distinct
+    indices (Sec. 13).
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/octopus_pmf.py
+  exact_location: octopus_pmf.py:261-328; costs.sage:227-248, 466-469; KN Sec. 13 'we assume that a single hash function invocation
+    is sufficient'
+  date: 2026-08-26
+  confidence: H
+  agent: B
+- id: B-014
+  statement: 'The analytic worst case is a combined count: worst_case(p_wots, 2^-30, d) [negative-binomial over all d layers]
+    + worst_case(p_fts, 2^-30, 1) * 2 hashes; i.e. each component at 2^-30, summed (not a joint 2^-30 bound).'
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: costs.sage:254-289, 411, 447, 454, 469, 474
+  date: 2026-08-26
+  confidence: H
+  agent: B
+- id: B-015
+  statement: 'Security model: sigma = sum_r Bin(q_s, 2^-h)[r] * P_forge(r); FORS P=(1-(1-1/t)^r)^k; PORS+FP P=C(min(rk,t),k)/C(t,k);
+    bits = -log2 max(2^-128, sigma). Port reproduces the repo''s 6,479 passing (h,d,k,a) on the canonical 2^40 grid and the
+    W+C/F+C/P+FP pool counts 6666/7077/7746.'
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/security.sage
+  exact_location: security.sage:82-152; tests/fixtures.json variant_pool_counts and _comment_w_grid_2026_08_21
+  date: 2026-08-26
+  confidence: H
+  agent: B
+- id: B-016
+  statement: Plain W+C S=2840 (w=256) halves-to-thirds verification (10635 -> 6635 compr @2^40) at ~40x more WOTS+C grinding
+    (3745 -> 15e4 hashes); S is a verify-cost lever, not a size lever.
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: Table 1 2^40 W+C rows 40/5/14/11/256 S=2040 vs S=2840
+  date: 2025-12-08
+  confidence: H
+  agent: B
+- id: B-017
+  statement: 'KN target: at most 2.6 verification compressions per signature byte; the 2^40 P+FP bold row is at 2.62 (the
+    one stated exception).'
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: Sec. 13, paragraph before Table 1 ('we want at most 2.6 invocations per byte ... except one with ratio 2.61')
+  date: 2025-12-08
+  confidence: M
+  note: Text says 2.61, table prints 2.62 (10559/4036 = 2.616). Minor internal inconsistency (rounding).
+  agent: B
+- id: B-018
+  statement: 'FD (plain SPHINCS+, no grinding) Level-1 2^20 sets: C-1 (h24 d3 a16 k8 w256) 3440 B / 5,113,336 sign hashes
+    / 7077 verify; D-1 (h24 d2 a21 k6 w256) 3088 B / 75.5M; AAA-1 (h30 d2 a24 k5 w256) 3072 B / 554M; AAA-2 = SPHINCS+-128s-q20
+    (h18 d1 a24 k6 w16) 3264 B.'
+  source_url: https://eprint.iacr.org/2024/018.pdf
+  exact_location: Sec. 9.1, Tables 4 (C), 5 (D), 6 (AAA)
+  date: 2024-01 (ePrint 2024/018; revision date not verified)
+  confidence: M
+  reproduced:
+    C-1:
+      size: 3440
+      sign_hashes: 5113336
+      verify_hashes: 7050
+    D-1:
+      size: 3088
+      sign_hashes: 75513851
+      verify_hashes: 4750
+    AAA-1:
+      size: 3072
+      sign_hashes: 553779196
+      verify_hashes: 4749
+    AAA-2:
+      size: 3264
+      sign_hashes: 449314812
+      verify_hashes: 433
+  note: Sizes agree exactly (with R = n = 16 B). Sign hashes agree to within 5 hashes; verify hashes differ by +18..+27 (FD
+    counts expected chain walk/checksum differently). All four pass >= 128 bits under the Blockstream security model at 2^20.
+  agent: B
+- id: B-019
+  statement: FD select by 'tuned' security (attack probability ~2^-n at the limit) plus a retained-security overuse metric
+    (sigs at level 112) and signing-hash budgets 1e5..6e8; KN select by >= 128-bit security at the limit, size, and a compressions/byte
+    verification cap. FD has no grinding (WOTS+C/FORS+C/PORS+FP).
+  source_url: https://eprint.iacr.org/2024/018.pdf
+  exact_location: Sec. 6 'Tuning Sphincs+', Sec. 9 selection-set definition
+  date: 2024-01
+  confidence: M
+  agent: B
+- id: B-020
+  statement: With grinding the KN 2^20 P+FP point (3128 B @ ~6.0e6 sign hashes) is 312 B smaller than FD C-1 (3440 B @ 5.1e6
+    hashes) at similar signing cost; FD's D-1/AAA-1 (3088/3072 B) need 75M-554M hashes, which grinding variants beat at ~1e7
+    (2856 B, KN Table 2).
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: KN Table 2 vs FD Tables 4-6
+  date: 2026-10-22
+  confidence: M
+  agent: B
+- id: B-021
+  statement: The repo m_max rule (PORS+FP within 1.11x FORS+C signing time) chooses ~2^16.3-2^18 PORS+FP tries. Hardware-wallet-safe
+    points (every grind <= 2^12 tries, 2^-30 worst <= 2^20 hashes, sign <= 2^23 compr.) reach 2876 B @2^20, 3456 B @2^30,
+    3944 B @2^40 (R=16), vs repo-profile refs 3112/3424/4020.
+  source_url: file://grindstone/kb/params/shortlist_draft.yaml
+  exact_location: profile hw_wallet_safe; generated by kb/params/build_shortlist.py from params_candidates.parquet
+  date: 2026-10-22
+  confidence: M
+  note: Model-derived (costs.py), not measured. Same cost model as the paper.
+  agent: B
+- id: B-022
+  statement: WOTS+C z=1 at w=256 (S = mean of 15 chains = 1912) costs ~2^17.5 expected tries per layer and saves 16 B per
+    layer; it is the dominant lever in every GPU-signer point. Not modelled in the repo (z=0 everywhere); its security impact
+    is not analysed there.
+  source_url: https://eprint.iacr.org/2025/2203.pdf
+  exact_location: Sec. 5 (zero-chains); grindstone/ref/costs.py wots_c_success_prob
+  date: 2026-10-22
+  confidence: M
+  agent: B
+- id: B-023
+  statement: 'GPU-signer size floor under <=2^24 tries/instance and <=2^30 sign compressions: 2280 B @2^20, 2664 B @2^30,
+    2892 B @2^40 (R=16); these are tree-build bound (d=2-3, h''=16, ~5-8e8 compressions), grinding <= ~2^25.5 compressions.'
+  source_url: file://grindstone/kb/params/shortlist_draft.yaml
+  exact_location: profile gpu_signer_max
+  date: 2026-10-22
+  confidence: M
+  agent: B
+- id: B-024
+  statement: 'Open decision: R size. Paper tables use R=32 B, repo HEAD and FIPS 205 use R=n=16 B; all GRINDSTONE parquet/shortlist
+    sizes are R=16 with a sig_bytes_paper_r32 column (+16).'
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: costs.sage:40
+  date: 2026-10-22
+  confidence: H
+  agent: B
+- id: B-025
+  statement: WC Search (2^-30) in the paper/repo is a sum of per-component 2^-30 bounds (WOTS+C negative-binomial over d layers
+    + FTS geometric), not a joint 2^-30 bound; empirical tails should be compared per component.
+  source_url: https://github.com/BlockstreamResearch/SPHINCS-Parameters/blob/ceee8ed67e8b69ae2d8efd10065b5a550c330018/costs.sage
+  exact_location: costs.sage:454, 474
+  date: 2026-08-26
+  confidence: H
+  agent: B
+- id: C-C001
+  statement: BIP-360 (Pay-to-Merkle-Root, P2MR) was merged into the bitcoin/bips repository on 2026-02-11.
+  source: bip-0360
+  location: 'bitcoin/bips commit eae7d9fc57 ''BIP360: Pay to Merkle Root (P2MR) (#1670)'', committer date 2026-02-11T21:01:47Z'
+  value:
+    merge_date: 2026-02-11
+    commit: eae7d9fc57
+    pr: 1670
+  confidence: H
+  verified_by_us: false
+  tags:
+  - timeline
+  - bip360
+  agent: C
+- id: C-C002
+  statement: 'BIP-360 was renamed from Pay-to-Tapscript-Hash (P2TSH) to Pay-to-Merkle-Root (P2MR) in version 0.11.0 (2026-02-10).
+    At fetch time (2026-10-22) it is Status: Draft, Version 0.12.1.'
+  source: bip-0360
+  location: Header preamble; Changelog entries 0.11.0 and 0.12.1
+  value:
+    rename_version: 0.11.0
+    rename_date: 2026-02-10
+    status: Draft
+    version: 0.12.1
+  confidence: H
+  verified_by_us: false
+  tags:
+  - timeline
+  - bip360
+  notes: The plan calls it 'formerly P2QRH'. The changelog records the last rename as P2TSH→P2MR. The Delving thread 1811
+    shows P2QRH was the earlier name, so the naming went P2QRH → P2TSH → P2MR.
+  agent: C
+- id: C-C003
+  statement: BIP-360 does not specify post-quantum signatures; its authors 'intend to offer a separate proposal for this purpose
+    upon further research.'
+  source: bip-0360
+  location: Abstract/Motivation paragraph (line ~29 of bip-0360.mediawiki)
+  value:
+    pq_signature_in_bip360: false
+  confidence: H
+  verified_by_us: false
+  tags:
+  - timeline
+  - bip360
+  - scope
+  agent: C
+- id: C-C004
+  statement: A P2MR depth-1 witness (Schnorr leaf) is 135 bytes, 69 bytes larger than a P2TR key-path witness (66 B), and
+    32 bytes smaller than an equivalent P2TR script-path witness (34 bytes at m = 7).
+  source: bip-0360
+  location: Section on witness size comparison (P2MR witness for a depth-1 tree; general case 103 + 32*m bytes)
+  value:
+    p2mr_depth1_witness_bytes: 135
+    p2tr_keypath_witness_bytes: 66
+    delta_vs_keypath: 69
+    delta_vs_p2tr_scriptpath: -32
+  confidence: H
+  verified_by_us: false
+  tags:
+  - vbytes
+  - bip360
+  - fees
+  agent: C
+- id: C-C005
+  statement: The SHRINCS draft BIP was announced on bitcoindev on 2026-08-26 by conduition for the SHRINCS Working Group.
+    As of 2026-09-19 it had not been opened as a PR to bitcoin/bips. Murch (BIP editor) invited a PR on 2026-09-11.
+  source: ml-shrincs-draft-2026
+  location: Root message 2026-08-26 21:17 UTC; Murch 2026-09-11; conduition 2026-09-19
+  value:
+    announced: 2026-08-26
+    bips_pr_opened_as_of_2026_09_19: false
+  confidence: H
+  verified_by_us: false
+  tags:
+  - timeline
+  - shrincs
+  notes: PR status after 2026-09-19 was not checked.
+  agent: C
+- id: C-C006
+  statement: 'The SHRINCS draft states: stateless signatures are 5777 bytes, stateful signatures are 548 bytes at minimum,
+    and public keys are 48 bytes.'
+  source: ml-shrincs-draft-2026
+  location: Root message, 'Features' list
+  value:
+    pk_bytes: 48
+    stateful_sig_min_bytes: 548
+    stateless_sig_bytes: 5777
+  confidence: H
+  verified_by_us: false
+  tags:
+  - shrincs
+  - size
+  notes: 'Conflicts with the original Delving SHRINCS post (2025-12-11): 324 B at q=1, 16-byte pk. The design evolved (FIPS-205
+    compatibility, 2^40 stateless budget, faster stateful params). The plan''s ''~324 B'' refers to the 2025 version.'
+  agent: C
+- id: C-C007
+  statement: 'Original SHRINCS (Dec 2025): with intact state, signature size is min(292 + q*16, s_l) + 16 bytes at NIST L1,
+    i.e. 324 B for q = 1; the WOTS+C OTS is 292 B.'
+  source: delving-shrincs-2158
+  location: 'Post #1 (jonasnick, 2025-12-11)'
+  value:
+    ots_bytes: 292
+    auth_path_bytes_per_q: 16
+    sig_bytes_q1: 324
+  confidence: H
+  verified_by_us: false
+  tags:
+  - shrincs
+  - size
+  - superseded
+  agent: C
+- id: C-C010
+  statement: With WOTS+C/FORS+C/PORS+FP optimizations, SPHINCS+ signatures are 4036 B at a 2^40 signature bound, 3440 B at
+    2^30 and 3128 B at 2^20; standard SPHINCS+ is 'almost 8KB'.
+  source: ml-hbs-thread-2025
+  location: Root message (Kudinov & Nick, 2025-12-08), paragraph 3
+  value:
+    sig_bytes:
+      q2_40: 4036
+      q2_30: 3440
+      q2_20: 3128
+    standard_sphincs: almost 8KB
+  confidence: H
+  verified_by_us: false
+  tags:
+  - params
+  - size
+  agent: C
+- id: C-C011
+  statement: A 4480-byte signature at the 2^40 limit (Table 1 of the report) has a verification-cost-to-size ratio 'almost
+    9 times better' than Schnorr.
+  source: ml-kudinov-2025-12-09a
+  location: Section 'On verification costs'
+  value:
+    sig_bytes: 4480
+    sig_limit_log2: 40
+    verify_ratio_vs_schnorr: almost 9x better
+  confidence: H
+  verified_by_us: false
+  tags:
+  - params
+  - verification
+  agent: C
+- id: C-C012
+  statement: The WOTS+C + PORS+FP variant is 16% to 18% smaller than vanilla, size-optimized SPHINCS+ for 2^40 signatures
+    max (per costs.sage).
+  source: ml-nick-2025-12-10
+  location: Paragraph 1
+  value:
+    size_reduction_pct:
+    - 16
+    - 18
+    sig_limit_log2: 40
+  confidence: H
+  verified_by_us: false
+  tags:
+  - params
+  - size
+  - grinding
+  agent: C
+- id: C-C013
+  statement: Quantum attacks on 128-bit hash security require approximately 2^78 Toffoli depth in practice, with limited parallelization
+    benefits.
+  source: ml-hbs-thread-2025
+  location: Root message, security-targets paragraph
+  value:
+    toffoli_depth_log2: 78
+  confidence: M
+  verified_by_us: false
+  tags:
+  - security
+  - quantum-estimate
+  notes: 'A summary of the ePrint argument; Jonas Nick restates it on Delving 2158 #3 (SHA-256 circuit depth 2^14; ''268 million
+    quantum computers running Grover''s algorithm for a decade'').'
+  agent: C
+- id: C-C020
+  statement: 'Trezor benchmarks on the Model T: 75 seconds to create one SLH-DSA-SHA2-128s signature.'
+  source: ml-conduition-2025-12-09
+  location: Final section, citing gist onvej-sl/3851bdae7ae5aa1f2624ca769737ea2e
+  value:
+    device: Trezor Model T
+    scheme: SLH-DSA-SHA2-128s
+    sign_s: 75
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class0
+  - latency
+  - hardware-wallet
+  - secondhand
+  notes: Second-hand citation of a Trezor gist; Agent D should take the number from the gist.
+  agent: C
+- id: C-C021
+  statement: conduition's optimized SLH-DSA-SHA2-128s signs in 11 ms and generates keys in 2 ms (1 ms batched) on his desktop
+    CPU, versus PQClean's 94 ms and 12 ms. It needs several MB of RAM and does not help hardware wallets.
+  source: ml-slhdsa-perf-2025
+  location: Root message (Google Groups render)
+  value:
+    sign_ms: 11
+    keygen_ms: 2
+    keygen_batched_ms: 1
+    pqclean_sign_ms: 94
+    pqclean_keygen_ms: 12
+    ram: several megabytes
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class2
+  - latency
+  - ram
+  notes: 'UNCERTAIN: not in the gnusha archive; read via a fetch-tool summary of Google Groups. A later archived message (conduition,
+    2026-06-09) says ''10 to 12 milliseconds on my desktop CPU'', which is consistent.'
+  agent: C
+- id: C-C022
+  statement: A Vulkan implementation of SLH-DSA-SHA2-128s signs in 2.67 ms on an RTX 3060 Ti (2025 benchmark).
+  source: shrincs-bip-draft
+  location: Footnote [^vulkan]
+  value:
+    gpu: RTX 3060 Ti
+    scheme: SLH-DSA-SHA2-128s
+    sign_ms: 2.67
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class3
+  - latency
+  - gpu
+  - secondhand
+  notes: Cited from conduition.io/code/fast-slh-dsa (blog). Useful as a Class-3 cross-check for E0/E4.
+  agent: C
+- id: C-C023
+  statement: 'Blockstream measured mean signing times (100 runs) on HW wallets. SLH-DSA-SHA2-128 (7856 B): Jade Plus 52.85
+    s, Trezor Safe 3/5/7 65.31 s, Ledger Nano gen5/s+ 120.12 s, BitBox02 Nova 100.1 s. SPHINCS+ 2^40 (5776 B): 43.28 / 53.45
+    / 94.98 / 78.4 s.'
+  source: blockstream-hww-blog-2026
+  location: '''The Numbers'' SigGen table'
+  value:
+    slh_dsa_128_s:
+      jade_plus: 52.85
+      trezor: 65.31
+      ledger: 120.12
+      bitbox02_nova: 100.1
+    sphincs_2_40_s:
+      jade_plus: 43.28
+      trezor: 53.45
+      ledger: 94.98
+      bitbox02_nova: 78.4
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class0
+  - latency
+  - hardware-wallet
+  - mean-only
+  notes: Blog (secondary). Same 'average' reference C library on all devices, 70–240 MHz CPUs. No tail percentiles reported.
+  agent: C
+- id: C-C024
+  statement: On the same HW wallets, UXMSS (SHRINCS-L, 1092 B) signing with WOTS+C target sum S_wn=96 takes 3.01–8.04 s (mean).
+    With 'overgrinding' to S_wn=140 it takes 225.63–572.78 s (Jade 225.63, Trezor 264.74, Ledger 572.78, BitBox02 334.6).
+  source: blockstream-hww-blog-2026
+  location: SigGen table rows 'SHRINCS-L (swn=96, 1092 B)' and 'UXMSS (SHRINCS-L) (swn=140, 1092 B)'; text 'Due to overgrinding...'
+  value:
+    swn_96_s:
+      jade_plus: 3.31
+      trezor: 3.01
+      ledger: 8.04
+      bitbox02_nova: 5.5
+    swn_140_s:
+      jade_plus: 225.63
+      trezor: 264.74
+      ledger: 572.78
+      bitbox02_nova: 334.6
+    w: 4
+    chains: 64
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class0
+  - grinding
+  - latency
+  - hardware-wallet
+  - mean-only
+  - key-for-grindstone
+  notes: 'The most direct published grinding-cost data on HW wallets. w=4 and l=64 come from Delving 2158 #20 (SHRINCS-L params
+    n=16, w=4, l=64, S_wn=140). The blog''s row labels are slightly inconsistent (''SHRINCS-L'' vs ''UXMSS (SHRINCS-L)'');
+    interpretation M.'
+  agent: C
+- id: C-C025
+  statement: 'SHRINCS-L benchmark on an Intel Core i5 (one thread): stateful signing 3742.92 ms, stateless signing 17974.8
+    ms; stateful verify 0.015506 ms, stateless verify 0.073762 ms. Stateful sig 1092 B (q=1), stateless sig 4396 B.'
+  source: delving-shrincs-2158
+  location: 'Post #20 (olkurbatov, 2026-03-16)'
+  value:
+    stateful_sign_ms: 3742.92
+    stateless_sign_ms: 17974.8
+    stateful_verify_ms: 0.015506
+    stateless_verify_ms: 0.073762
+    stateful_sig_bytes_q1: 1092
+    stateless_sig_bytes: 4396
+    params: n=16, w=4, l=64, S_wn=140, h_sf=207, h_sl=24, d=2, k=6, a=22
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class2
+  - grinding
+  - latency
+  - shrincs-l
+  notes: Liquid/Simplicity-oriented variant, not the Bitcoin SHRINCS draft.
+  agent: C
+- id: C-C026
+  statement: 'SHRINCS draft average signing cost in SHA-256 compressions: stateless 1,707,229; stateful UXMSS depth 255 133,326
+    (depth 31: 16,510); BXMSS depth 10: 534,341.'
+  source: shrincs-bip-draft
+  location: Section 'Signing' table (CONST STATELESS_SIGN_COMPRESSIONS_AVG etc.)
+  value:
+    stateless_avg: 1707229
+    uxmss31_avg: 16510
+    uxmss255_avg: 133326
+    bxmss10_avg: 534341
+  confidence: H
+  verified_by_us: false
+  tags:
+  - shrincs
+  - signer-cost
+  - compressions
+  notes: Templated constants in a living draft (commit 2d1679b, 2026-10-18); may change.
+  agent: C
+- id: C-C027
+  statement: 'SHRINCS draft verification cost: stateful 255–509 compressions (max 0.465 C/B), stateless 467–2792 compressions
+    (max 0.483 C/B). BIP-340 verification ≈ 127 compression-equivalents (1.98 per signature byte).'
+  source: shrincs-bip-draft
+  location: Section 'Verification' table and following paragraph
+  value:
+    stateful_verify:
+    - 255
+    - 509
+    stateless_verify:
+    - 467
+    - 2792
+    bip340_equiv_compressions: 127
+    bip340_cpb: 1.98
+  confidence: H
+  verified_by_us: false
+  tags:
+  - shrincs
+  - verification
+  agent: C
+- id: C-C028
+  statement: 'SHRINCS stateless parameters: SLH-DSA (FIPS-205 algorithms) with n=16, lg_w=4, d=5, h''=9, a=13, k=10; 2^40
+    budget; 26% smaller than SLH-DSA-SHA2-128s; 23% fewer compressions for average signing and 28% fewer for worst-case verification.
+    No FORS+C or PORS+FP is used.'
+  source: shrincs-bip-draft
+  location: Sections 'Stateless Parameters' and 'Why not use a standardized SLH-DSA parameter set?'
+  value:
+    n: 16
+    lg_w: 4
+    d: 5
+    h_prime: 9
+    a: 13
+    k: 10
+    budget_log2: 40
+    size_reduction_pct: 26
+    sign_reduction_pct: 23
+    verify_reduction_pct: 28
+  confidence: H
+  verified_by_us: false
+  tags:
+  - shrincs
+  - params
+  - scope-for-grindstone
+  agent: C
+- id: C-C029
+  statement: 'SHRINCS WOTS+C grind: H_grind = sha256(pk_seed || zeros(48) || ADRS[:10] || digest(32 B) || zeros(4) || counter(u16))[:16].
+    At most 2^16 attempts. With w=16 and 32 chains, about 2^122 of 2^128 index sets hit the constant sum 240, so P(success)
+    ≈ 2^-6 (derived). Failure probability < 2^-1450.'
+  source: shrincs-bip-draft
+  location: Sections 'H_grind(...)', 'wots_c_grind_to_constant_sum(...)', 'Stateful Parameters/Constants'
+  value:
+    counter_bits: 16
+    max_attempts: 65536
+    chains: 32
+    chain_bits: 4
+    constant_sum: 240
+    frac_valid_log2: -6
+    fail_prob_log2: -1450
+    compressions_per_attempt_derived: 1
+  confidence: H
+  verified_by_us: false
+  tags:
+  - shrincs
+  - grinding
+  - layout
+  - derived
+  - key-for-grindstone
+  notes: Differs from plan §3.5 (32-bit counter, 16-B m, 42-B layout). The first 64-B block (pk_seed||zeros(48)) is constant,
+    so a cached midstate gives one compression per attempt (our derivation). The '2^122 of 2^128' figure is marked TODO-template
+    in the draft. Our formula in plan §3.5 gives E[tries] ≈ 65.7 for w=16, len1=32, S=240, which is consistent.
+  agent: C
+- id: C-C030
+  statement: 'SHRINCS draft: the stateless PRF_msg_sl may be replaced with an XOF from which the signer samples multiple randomizers
+    to grind for hypertree pruning, trading signature budget for faster signing/keygen on low-power devices.'
+  source: shrincs-bip-draft
+  location: Notes under tweakable-hash/PRF definitions; 'What about hardware wallets?'
+  value:
+    grind_type: R-grinding (randomizer)
+    purpose: hypertree-pruning
+  confidence: H
+  verified_by_us: false
+  tags:
+  - shrincs
+  - grinding
+  - hardware-wallet
+  - key-for-grindstone
+  agent: C
+- id: C-C031
+  statement: 'SHRIMPS compact path: 2564 B at q_s = 2^10 with (k,a,h,d) = (8,17,12,1), w=16, S_wn=240, costing 6.8M compressions
+    to sign. SLH-DSA (q_s = 2^64) is 7856 B at 2.3M compressions. Verification is 0.30 C/B for SLH-DSA vs ~0.19 for d=1 sets.'
+  source: delving-shrimps-2355
+  location: 'Post #1 (jonasnick, 2026-03-27), parameter table'
+  value:
+    sig_bytes: 2564
+    q_s_log2: 10
+    sign_compressions: 6.8e6
+    slh_dsa_sign_compressions: 2.3e6
+    slh_dsa_bytes: 7856
+  confidence: H
+  verified_by_us: false
+  tags:
+  - params
+  - grinding
+  - signer-cost
+  - shrimps
+  agent: C
+- id: C-C032
+  statement: Generating a SPHINCS+ signature via generic MPC is estimated to take around 85 minutes.
+  source: ml-hbs-thread-2025
+  location: Kudinov reply to Boris Nagaev, 2025-12-10 00:01 UTC, citing report §15.3
+  value:
+    mpc_sign_minutes: 85
+  confidence: M
+  verified_by_us: false
+  tags:
+  - mpc
+  - latency
+  - secondhand
+  agent: C
+- id: C-C040
+  statement: For a 2-input 2-output tx, P2TR+Schnorr weighs 840 WU and P2MR+SHRINCS (stateless) weighs 12426 WU, a ~14.8x
+    difference.
+  source: ml-shrincs-draft-2026
+  location: conduition reply 2026-09-04 (2fb38fb8-...)
+  value:
+    p2tr_wu: 840
+    p2mr_shrincs_stateless_wu: 12426
+    ratio: 14.8
+    non_witness_bytes: 178
+    witness_bytes_per_input: 5857
+  confidence: H
+  verified_by_us: false
+  tags:
+  - fees
+  - vbytes
+  - cross-check-agent-E
+  agent: C
+- id: C-C041
+  statement: P2TR 1-in-2-out key-path spend is 154 vB. P2MR 1-in-2-out spending a Schnorr leaf (two-leaf tree with a PQ leaf)
+    is 171.25 vB, +17.25 vB (11%).
+  source: ml-pq-output-type-2026
+  location: Ethan Heilman, 2026-04-11 00:20 UTC (CAEM=y+UYBQoocr95ucutw_9QoTuyRcpGPTf_1wgazzK3nbFyyQ@mail.gmail.com)
+  value:
+    p2tr_keypath_vb: 154
+    p2mr_schnorr_leaf_vb: 171.25
+    delta_vb: 17.25
+  confidence: H
+  verified_by_us: false
+  tags:
+  - fees
+  - vbytes
+  - bip360
+  - cross-check-agent-E
+  agent: C
+- id: C-C042
+  statement: SLH-DSA with h=40 d=4 a=13 k=12 w=4 gives 7696-byte signatures costing about 1000 SHA-256 compressions to verify,
+    about 64x cheaper per byte than Schnorr with hardware acceleration.
+  source: delving-pqc-output-2749
+  location: 'Post #9 (conduition, 2026-08-22)'
+  value:
+    h: 40
+    d: 4
+    a: 13
+    k: 12
+    w: 4
+    sig_bytes: 7696
+    verify_compressions: 1000
+  confidence: M
+  verified_by_us: false
+  tags:
+  - params
+  - verification
+  agent: C
+- id: C-C043
+  statement: A 10-thread CPU prover (naive extension of Flock benchmarks) proves ~338000 SHA-256 compressions/s, ~482 signature
+    verifications/s for h=36 d=4 a=13 k=15 w=4, ~20 s per block of ~10,000 signatures.
+  source: delving-snark-agg-2875
+  location: 'Post #10 (conduition, 2026-09-16)'
+  value:
+    compressions_per_s: 338000
+    sigs_per_s: 482
+    block_prove_s: 20
+  confidence: L
+  verified_by_us: false
+  tags:
+  - proving
+  - verification
+  - extrapolated
+  agent: C
+- id: C-C050
+  statement: Citing the Google Quantum AI whitepaper (p.7), conduition states a QC needs at least 4.5*n logical qubits to
+    break an n-bit curve with a practical Toffoli count, so 'Breaking secp256k1 requires at least 1200.'
+  source: ml-ec-disabling-2026
+  location: conduition, 2026-08-16 19:30 UTC; the same text is re-quoted by waxwing 2026-08-18
+  value:
+    logical_qubits_per_bit: 4.5
+    secp256k1_logical_qubits: 1200
+    framing: at least
+  confidence: M
+  verified_by_us: false
+  tags:
+  - quantum-estimate
+  - timeline
+  - secondhand
+  notes: 'CONFLICT IN FRAMING: the plan §1.1 says Google estimates secp256k1 at ''≤1,200 logical qubits''; conduition says
+    ''at least 1200''. These may refer to different things (an upper bound for the paper''s circuit vs. a lower bound across
+    curve sizes). Read the primary whitepaper before using either.'
+  agent: C
+- id: C-C051
+  statement: IonQ (Sep 2026) estimate of 1,457 logical qubits / ~39M Toffoli for secp256k1 (as stated in the plan).
+  source: none-found
+  location: Not found in the bitcoindev or Delving sources Agent C searched (gnusha queries 'IonQ', 'Toffoli', 'logical qubits')
+  value:
+    logical_qubits: 1457
+    toffoli: 3.9e7
+  confidence: L
+  verified_by_us: false
+  tags:
+  - quantum-estimate
+  - timeline
+  - unverified
+  - not-found-in-C-sources
+  notes: Not discussed on the list as far as Agent C found. Needs a primary IonQ source before use.
+  agent: C
+- id: D-C001
+  statement: pqm4 sphincs-sha2-128f-simple (clean) signing takes 368,575,228 cycles on Cortex-M4 (avg of 10).
+  source: https://raw.githubusercontent.com/mupq/pqm4/master/benchmarks.md
+  location: Speed Evaluation > Signature Schemes table, row sphincs-sha2-128f-simple clean
+  value:
+    sign_cycles: 368575228
+    keygen_cycles: 15742990
+    verify_cycles: 21923628
+    clock_note: measured at 24 MHz
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0
+  - pqm4
+  - sphincs
+  - cross-check
+  - cited
+  agent: D
+- id: D-C002
+  statement: pqm4 sphincs-sha2-128s-simple (clean) signing takes 7,657,558,168 cycles on Cortex-M4 (avg of 10).
+  source: https://raw.githubusercontent.com/mupq/pqm4/master/benchmarks.md
+  location: Speed Evaluation > Signature Schemes table, row sphincs-sha2-128s-simple clean
+  value:
+    sign_cycles: 7657558168
+    keygen_cycles: 1007731522
+    verify_cycles: 7471794
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0
+  - pqm4
+  - sphincs
+  - cross-check
+  - cited
+  agent: D
+- id: D-C003
+  statement: In pqm4, ~90.7% of SPHINCS+-sha2-128f/128s signing cycles are spent in SHA-2.
+  source: https://raw.githubusercontent.com/mupq/pqm4/master/benchmarks.md
+  location: Hashing Evaluation > Signature Schemes table, rows sphincs-sha2-128f/128s-simple (sign column 90.7%)
+  value:
+    hashing_share_sign: 0.907
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0
+  - pqm4
+  - cited
+  agent: D
+- id: D-C004
+  statement: pqm4 cycle counts are obtained at 24 MHz to avoid flash wait states.
+  source: https://github.com/mupq/pqm4
+  location: README, benchmarking section
+  value:
+    clock_MHz: 24
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0
+  - pqm4
+  - methodology
+  - cited
+  agent: D
+- id: D-C005
+  statement: Back-calculated from D-C001..3, one SHA-256 compression (incl. per-call overhead) costs ~2,950 (128f) to ~3,130
+    (128s) Cortex-M4 cycles in pqm4 clean SPHINCS+.
+  source: derived (kb/raw/D report section 7)
+  location: 'compressions per signature: 128f ~113.3k, 128s ~2.22M (1 comp per F/H/PRF with seeded midstate; T_len = 10 blocks)'
+  value:
+    cycles_per_compression_128f: 2950
+    cycles_per_compression_128s: 3128
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class0
+  - derived
+  - cross-check
+  agent: D
+- id: D-C006
+  statement: LMS (SHA-256, w=16, h=5) key generation takes 117,988,963 cycles on an STM32F4DISCOVERY Cortex-M4.
+  source: https://pmc.ncbi.nlm.nih.gov/articles/PMC7334983
+  location: Campos, Kohlstadt, Reith, Stoettinger, AFRICACRYPT 2020, Table 4 row 'LMS SHA-256 16 5 1'
+  value:
+    keygen_cycles: 117988963
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0
+  - lms
+  - cited
+  agent: D
+- id: D-C007
+  statement: Dividing D-C006 by ~35,487 compressions gives ~3,325 cycles per SHA-256 compression on Cortex-M4.
+  source: derived
+  location: 32 leaves x (67 chains x 15 + 67 PRF + 35 pubkey-hash blocks + 1) + 31 tree nodes
+  value:
+    cycles_per_compression: 3325
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class0
+  - derived
+  - cross-check
+  agent: D
+- id: D-C008
+  statement: wolfSSL measures software SHA-256 at 2.602 MB/s on STM32F437 (Cortex-M4 @160 MHz, -Os, no HW crypto).
+  source: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+  location: STM32F437 (No HW Crypto, -Os, FastMath), SHA-256 line
+  value:
+    bytes_per_s: 2602000.0
+    clock_MHz: 160
+    compressions_per_s: 40700.0
+    cycles_per_byte: 61.5
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0a
+  - cited
+  agent: D
+- id: D-C009
+  statement: wolfSSL measures software SHA-256 at 847.458 KiB/s on STM32L4A6Z (Cortex-M4 @80 MHz, no asm).
+  source: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+  location: STM32L4A6Z (No HW Crypto, SP Math All NO ASM), SHA-256 line
+  value:
+    bytes_per_s: 867797
+    clock_MHz: 80
+    compressions_per_s: 13600.0
+    cycles_per_byte: 92.2
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0a
+  - cited
+  agent: D
+- id: D-C010
+  statement: wolfSSL measures SHA-256 at 985 KB/s on STM32WB55 (Cortex-M4 @64 MHz), identical with and without HW hash enabled.
+  source: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+  location: STM32WB55 sections, SHA-256 lines
+  value:
+    bytes_per_s: 985222
+    clock_MHz: 64
+    compressions_per_s: 15400.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0a
+  - cited
+  agent: D
+- id: D-C011
+  statement: wolfCrypt Thumb2-asm SHA-256 runs at 5488 KiB/s and MbedTLS at 3849 KiB/s on STM32H563 (Cortex-M33 @250 MHz,
+    no HW crypto).
+  source: https://www.wolfssl.com/wordpress/wp-content/uploads/2026/07/wolfSSL-vs-MbedTLS.docx.pdf
+  location: Section 'STM32H563 (Cortex-M33 @ 250 MHz, bare metal)', results table, SHA-256 row
+  value:
+    wolfcrypt_KiBps: 5488
+    mbedtls_KiBps: 3849
+    cycles_per_byte_wolf: 44.5
+    cycles_per_byte_mbed: 63.4
+    compressions_per_s_wolf: 87800.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0a
+  - cited
+  - 2026
+  agent: D
+- id: D-C012
+  statement: 'STM32 HASH-peripheral SHA-256 measured by wolfSSL: STM32F437 7.446 MB/s @160 MHz, STM32L4A6Z 7.104 MiB/s @80
+    MHz, STM32U585 7.910 MB/s @160 MHz, STM32H563 20.703 MiB/s @250 MHz.'
+  source: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+  location: Sections with 'STM Crypto/Hash Acceleration' / 'Symmetric AES/SHA acceleration' / 'RNG and Hash', SHA-256 lines
+  value:
+    f437_cps: 116000.0
+    l4a6_cps: 116000.0
+    u585_cps: 124000.0
+    h563_cps: 339000.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0b
+  - cited
+  agent: D
+- id: D-C013
+  statement: STM32U5 HASH peripheral is claimed to process one 512-bit SHA-256 block in 66 clock cycles (RM0456 ch. 51); Trezor
+    had not used it as of the issue.
+  source: https://github.com/trezor/trezor-firmware/issues/3638
+  location: 'Issue #3638 description'
+  value:
+    cycles_per_block: 66
+    theoretical_cps_at_160MHz: 2420000.0
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class0b
+  - trezor
+  - cited
+  agent: D
+- id: D-C014
+  statement: Trezor Safe 7 uses STM32U5 MCU plus TROPIC01 and OPTIGA Trust M secure elements; Safe 3 and Safe 5 include a
+    secure element.
+  source: https://trezor.io/ja/learn/security-privacy/how-trezor-keeps-you-safe/trezor-safe-device-authentication-check
+  location: Page body
+  value:
+    mcu: STM32U5
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0
+  - devices
+  - cited
+  agent: D
+- id: D-C015
+  statement: BitBox02 uses an ATSAMD51J20A MCU and ATECC608B secure element.
+  source: https://www.etherbit.in/compare/wallets/bitbox02-vs-blockstream-jade
+  location: 'Comparison table: Controllers / Secure Elements'
+  value:
+    mcu: ATSAMD51J20A
+    se: ATECC608B
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class0
+  - devices
+  - cited
+  - secondary
+  agent: D
+- id: D-C016
+  statement: 'Coldcard Mk4 and Q have two secure elements: Microchip ATECC608 and Maxim DS28C36B.'
+  source: https://github.com/Coldcard/firmware/blob/master/docs/secure-elements.md
+  location: Dual Secure Elements > Background
+  value:
+    se1: ATECC608
+    se2: DS28C36B
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0
+  - devices
+  - cited
+  agent: D
+- id: D-C017
+  statement: Ledger Nano S Plus uses an ST33K1M5 secure element chip.
+  source: https://shop.ledger.com/products/ledger-nano-s-plus
+  location: 'Specs: Security'
+  value:
+    se: ST33K1M5
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class0
+  - devices
+  - cited
+  agent: D
+- id: D-C018
+  statement: ATECC608 I2C SCL clock is at most 1 MHz, bounding a 64-byte SHA block transfer to >= ~0.64 ms (<= ~1.56k blocks/s).
+  source: https://www.mouser.com/datasheet/2/268/ATECC608B_CryptoAuthentication_Device_Summary_Data-3555216.pdf
+  location: I2C AC parameters table, fSCL max 1 MHz (bound derived by us)
+  value:
+    fSCL_max_Hz: 1000000.0
+    max_blocks_per_s_derived: 1560
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class0c
+  - cited
+  - derived
+  agent: D
+- id: D-C019
+  statement: The external ATECC608A runs crypto operations about three orders of magnitude slower than on-chip MCU accelerators.
+  source: https://eprint.iacr.org/2021/058.pdf
+  location: Section on processing time, Fig. 2 discussion
+  value:
+    relative_slowdown: ~1000x
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class0c
+  - cited
+  agent: D
+- id: D-C020
+  statement: SUPERCOP measures sha256 at 11.34 cycles/byte (long messages, median) on Raspberry Pi 4 (Cortex-A72).
+  source: https://bench.cr.yp.to/results-nistlwc-hash/aarch64-pi4b.html
+  location: Cycles/byte for long messages, row sha256 (supercop-20251114)
+  value:
+    cycles_per_byte: 11.34
+    cycles_per_compression: 726
+    cps_per_core_1500MHz: 2070000.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class1
+  - pi4
+  - cited
+  agent: D
+- id: D-C021
+  statement: SUPERCOP measures sha256 at 27.31 cycles/byte for 64-byte messages on Raspberry Pi 4.
+  source: http://bench.cr.yp.to/results-hash/aarch64-pi4b.html
+  location: Cycles/byte for 64 bytes, row sha256 (supercop-20260330)
+  value:
+    cycles_per_byte_64B: 27.31
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class1
+  - pi4
+  - cited
+  agent: D
+- id: D-C022
+  statement: SUPERCOP measures sha256 at 2.03 cycles/byte (long) and 4.25 cycles/byte (64-byte msg) on Raspberry Pi 5 (Cortex-A76).
+  source: http://bench.cr.yp.to/results-hash/aarch64-pi5.html
+  location: Cycles/byte for long messages and for 64 bytes, rows sha256 (supercop-20251222)
+  value:
+    cycles_per_byte_long: 2.03
+    cycles_per_byte_64B: 4.25
+    cps_per_core_2400MHz: 18500000.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class1
+  - pi5
+  - cited
+  agent: D
+- id: D-C023
+  statement: wolfCrypt SHA-256 runs at 1464 MiB/s and MbedTLS at 205 MiB/s on Raspberry Pi 5 (Cortex-A76 @2.4 GHz).
+  source: https://www.wolfssl.com/wordpress/wp-content/uploads/2026/07/wolfSSL-vs-MbedTLS.docx.pdf
+  location: Section 'ARM Raspberry Pi 5', results table, SHA-256 row
+  value:
+    wolfcrypt_MiBps: 1464
+    mbedtls_MiBps: 205
+    cps_wolf_per_core: 24000000.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class1
+  - pi5
+  - cited
+  - 2026
+  agent: D
+- id: D-C024
+  statement: Raspberry Pi 4 B draws 1280 mA (6.4 W) under 400% CPU load (stress --cpu 4).
+  source: https://www.pidramble.com/wiki/benchmarks/power-consumption.html
+  location: Raspberry Pi 4 B table
+  value:
+    watts: 6.4
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class1
+  - power
+  - cited
+  agent: D
+- id: D-C025
+  statement: Raspberry Pi 5 draws ~8.8 W at full 4-core CPU load (stress); other reports give 7-11.2 W.
+  source: https://raspberry.tips/en/raspberrypi-tutorials/raspberry-pi-power-consumption-update-2026-all-models-compared
+  location: 'Measured Values by Scenario table: ''CPU Full Load all 4 cores (stress) ~8.8 W'''
+  value:
+    watts: 8.8
+    range:
+    - 7.0
+    - 11.2
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class1
+  - power
+  - cited
+  - secondary
+  agent: D
+- id: D-C026
+  statement: SUPERCOP measures sha256 at 2.05 cycles/byte (long) and 4.69 cycles/byte (64-byte msg) on Intel Core i7-13700H
+    P cores (Raptor Cove).
+  source: http://bench.cr.yp.to/results-hash/amd64-raptor.html
+  location: Cycles/byte for long messages / for 64 bytes, rows sha256 (supercop-20231107)
+  value:
+    cycles_per_byte_long: 2.05
+    cycles_per_byte_64B: 4.69
+    cycles_per_compression: 131
+    cps_per_core_4600MHz: 35100000.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class2
+  - sha-ni
+  - cited
+  agent: D
+- id: D-C027
+  statement: SUPERCOP measures sha256 at 2.05 cycles/byte (long) on Golden Cove (i3-12100) and on Gracemont E cores (i3-1215U).
+  source: http://bench.cr.yp.to/results-hash/amd64-alder2,little.html
+  location: Cycles/byte for long messages, row sha256; also results-hash/amd64-alder.html
+  value:
+    cycles_per_byte_long: 2.05
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class2
+  - sha-ni
+  - cited
+  agent: D
+- id: D-C028
+  statement: wolfCrypt SHA-256 (SHA extensions) runs at 1703 MiB/s on Intel i9-11950H; MbedTLS at 340 MiB/s.
+  source: https://www.wolfssl.com/wordpress/wp-content/uploads/2026/07/wolfSSL-vs-MbedTLS.docx.pdf
+  location: Section 'Intel i9-11950H (x86_64)', results table, SHA-256 row
+  value:
+    wolfcrypt_MiBps: 1703
+    cps_per_core: 27900000.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class2
+  - sha-ni
+  - cited
+  - 2026
+  agent: D
+- id: D-C029
+  statement: On SHA-NI hardware (Xeon Gold 5318Y), one 64-byte SHA-256 block via OpenSSL one-shot APIs takes roughly 80 ns.
+  source: https://github.com/hsw/openssl-sha256-bench
+  location: README, dispatch section
+  value:
+    ns_per_block: 80
+    cps_per_core: 12500000.0
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class2
+  - openssl
+  - cited
+  agent: D
+- id: D-C030
+  statement: An `openssl speed -evp sha256` example (OpenSSL 3.0.13, unnamed SHA-NI x86) reports 1,542,575.45k bytes/s at
+    16 KB blocks.
+  source: https://lindevs.com/benchmark-cryptographic-algorithms-performance-using-openssl
+  location: Example output table, sha256 row, 16384 bytes column
+  value:
+    bytes_per_s: 1542600000.0
+    cps: 24100000.0
+  confidence: L
+  verified_by_us: false
+  tags:
+  - class2
+  - openssl
+  - cited
+  - cpu-unspecified
+  agent: D
+- id: D-C031
+  statement: hashcat mode 1400 (SHA2-256) on RTX 4060 runs at 4037.5 MH/s (6.2.6, OpenCL) and 4108.8 MH/s (6.2.5 -O, CUDA).
+  source: https://github.com/0x3444/hashcat_benchmarks/blob/main/NVIDIA_GeForce_RTX_4060.txt
+  location: 'Hash-Mode 1400 Speed.#1; second run: gist desterhuizen/010addc5b07e+394f49e+7b960796e+51e+1'
+  value:
+    Hps:
+    - 4037500000.0
+    - 4108800000.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class3
+  - hashcat
+  - cited
+  agent: D
+- id: D-C032
+  statement: hashcat mode 1400 on RTX 4070 runs at 7828.4 MH/s (hashcat 6.2.6).
+  source: https://hashcat.net/forum/archive/index.php?thread-11394.html
+  location: Post by tischenko 04-21-2023, Speed.#1 for Hash-Mode 1400
+  value:
+    Hps: 7828400000.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class3
+  - hashcat
+  - cited
+  agent: D
+- id: D-C033
+  statement: hashcat mode 1400 on RTX 4090 runs at 21,188-21,976 MH/s across three independent runs (hashcat 6.2.6).
+  source: https://gist.github.com/Chick3nman/32e+662a5bb63bc4f51b847bb422222fd
+  location: Hash-Mode 1400 Speed.#1 21975.5 MH/s; also hashcat forum thread-11001 (21188.1) and thread-11277 (21791.7)
+  value:
+    Hps_range:
+    - 21188000000.0
+    - 21976000000.0
+  confidence: H
+  verified_by_us: false
+  tags:
+  - class3
+  - class4
+  - hashcat
+  - cited
+  agent: D
+- id: D-C034
+  statement: hashcat mode 1400 on RTX 5090 runs at 27,190.7 MH/s.
+  source: https://hashcat.net/forum/archive/index.php?thread-12487.html
+  location: '[Benchmark] GeForce RTX 5090, 1400 (SHA2-256) line'
+  value:
+    Hps: 27190700000.0
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class3
+  - class4
+  - hashcat
+  - cited
+  agent: D
+- id: D-C035
+  statement: On an 8x RTX 4090 rig (hashcat 6.2.6 -O -w 4) SHA2-256 runs at 21.5 GH/s per card; 4x H100 SXM total 65,963.4
+    MH/s (~16.5 GH/s each); 4x H100 PCIe total 50,179.6 MH/s (~12.5 GH/s each).
+  source: https://www.onlinehashcrack.com/tools-benchmark-hashcat-nvidia-rtx-4090.php
+  location: RTX 4090 page summary; H100-SXM and H100-PCIE pages Hash-Mode 1400 Speed.#*
+  value:
+    rtx4090_per_card: 21500000000.0
+    h100_sxm_total_4: 65963400000.0
+    h100_pcie_total_4: 50179600000.0
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class4
+  - hashcat
+  - cited
+  agent: D
+- id: D-C036
+  statement: OpenBenchmarking pts/hashcat-1.3.x 'SHA-256' lists ASUS RTX 4090 at ~50.07 GH/s, >2x all direct hashcat -b outputs;
+    unresolved conflict, not used.
+  source: https://openbenchmarking.org/test/pts/hashcat&eval=306f31f896ee6afac758df6db7589b6a2a232723
+  location: Compatible Public Results, ASUS NVIDIA GeForce RTX 4090 row
+  value:
+    Hps: 50067000000.0
+  confidence: L
+  verified_by_us: false
+  tags:
+  - class3
+  - conflict
+  - cited
+  agent: D
+- id: D-C037
+  statement: Across RTX 4060/4070/4090, hashcat mode-1400 throughput is ~64-65M H/s per SM per GHz (assuming ~2.6-2.65 GHz
+    sustained clocks).
+  source: derived (from D-C031..33)
+  location: H/s / (SM count x assumed clock)
+  value:
+    Hps_per_SM_GHz: 65000000.0
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class3
+  - derived
+  - scaling
+  agent: D
+- id: D-C038
+  statement: 'Estimated RTX 4050 Laptop @45 W (20 SM, 1.2-1.6 GHz) throughput: 1.56-2.09 G hashcat-H/s, i.e. ~1.3-2.0 G full
+    compressions/s (typical 1.8 G). No published Ada-laptop hashcat run was found.'
+  source: derived (from D-C037 and plan section 4.0 specs)
+  location: 20 x clock x 65M x 0.85-0.95 derate
+  value:
+    cps_low: 1300000000.0
+    cps_typical: 1800000000.0
+    cps_high: 2100000000.0
+  confidence: L
+  verified_by_us: false
+  tags:
+  - class3
+  - derived
+  - measured_pending
+  - E0
+  agent: D
+- id: D-C039
+  statement: 'Estimated i5-13420H all-core SHA-NI throughput: ~185-220M compressions/s bulk, ~100-230M/s for grinding (typical
+    180M/s) at 45 W.'
+  source: derived (from D-C026, D-C027)
+  location: 4P x 3.5-4.2 GHz /131 + 4E x 2.6-3.0 GHz /131, minus 10-30% per-try overhead
+  value:
+    cps_low: 100000000.0
+    cps_typical: 180000000.0
+    cps_high: 230000000.0
+  confidence: M
+  verified_by_us: false
+  tags:
+  - class2
+  - derived
+  - measured_pending
+  - E5
+  agent: D
+- id: E-001
+  statement: Transaction weight = base size * 3 + total size; virtual size = weight / 4 rounded up.
+  source: bip-0141
+  location: BIP-141, Transaction size calculations (mediawiki l.140-142)
+  value:
+    witness_scale_factor: 4
+    nonwitness_wu_per_byte: 4
+    witness_wu_per_byte: 1
+  confidence: H
+  verified_by_us: false
+  tags:
+  - weight
+  - consensus
+  agent: E
+- id: E-002
+  statement: P2MR control block is 1 + 32*m bytes (no internal key), m in 0..128; P2TR is 33 + 32*m.
+  source: bip-0360
+  location: BIP-360 v0.12.1, Rationale l.153 and Script Validation l.242, l.259
+  value:
+    p2mr_cb: 1+32m
+    p2tr_cb: 33+32m
+    m_max: 128
+  confidence: H
+  verified_by_us: false
+  tags:
+  - p2mr
+  - control-block
+  - weight
+  agent: E
+- id: E-003
+  statement: P2MR script trees of depth 0 are anyone-can-spend; depth >= 1 is encouraged.
+  source: bip-0360
+  location: BIP-360 l.155, l.171, l.260
+  value:
+    min_practical_depth: 1
+  confidence: H
+  verified_by_us: false
+  tags:
+  - p2mr
+  agent: E
+- id: E-004
+  statement: P2MR depth-1 witness with a 64-byte Schnorr sig and <PUSH32 pk> OP_CHECKSIG leaf is 135 bytes; general case 103
+    + 32*m; 32 bytes smaller than P2TR script path (34 at m=7).
+  source: bip-0360
+  location: BIP-360 Transaction Size and Fees, l.278-310
+  value:
+    depth1_witness_bytes: 135
+    general: 103+32m
+  confidence: H
+  verified_by_us: true
+  tags:
+  - p2mr
+  - weight
+  - reproduced-in-tests
+  agent: E
+- id: E-005
+  statement: 'P2MR output is SegWit v2: OP_2 OP_PUSHBYTES_32 <merkle root> (34-byte scriptPubKey), bc1z addresses.'
+  source: bip-0360
+  location: BIP-360 l.205-230
+  value:
+    spk_bytes: 34
+    witness_version: 2
+  confidence: H
+  verified_by_us: false
+  tags:
+  - p2mr
+  - output
+  agent: E
+- id: E-006
+  statement: Tapscript keeps the 520-byte maximum stack element size for both the initial stack and push opcodes.
+  source: bip-0342
+  location: BIP-342 Resource limits, l.132; Bitcoin Core src/script/script.h MAX_SCRIPT_ELEMENT_SIZE = 520
+  value:
+    max_element_bytes: 520
+  confidence: H
+  verified_by_us: false
+  tags:
+  - limits
+  - consensus
+  - tapscript
+  agent: E
+- id: E-007
+  statement: OP_SUCCESSx precedes the size check of the initial stack, so an OP_SUCCESSx-derived opcode requiring stack elements
+    bigger than 520 bytes may uplift the limit in a softfork.
+  source: bip-0342
+  location: BIP-342 l.59 and l.63; interpreter.cpp ExecuteWitnessScript comment 'OP_SUCCESSx processing overrides everything,
+    including stack element size limits'
+  value:
+    pq_sig_over_520_requires: OP_SUCCESSx-derived opcode or new leaf version
+  confidence: H
+  verified_by_us: false
+  tags:
+  - limits
+  - pq-opcode
+  - softfork
+  agent: E
+- id: E-008
+  statement: 'Policy: witness stack items in standard leaf-0xc0 tapscript spends are limited to 80 bytes; annexes are non-standard.'
+  source: bitcoin-core
+  location: src/policy/policy.h MAX_STANDARD_TAPSCRIPT_STACK_ITEM_SIZE{80}; policy.cpp IsWitnessStandard
+  value:
+    max_standard_tapscript_item: 80
+  confidence: H
+  verified_by_us: false
+  tags:
+  - policy
+  - limits
+  agent: E
+- id: E-009
+  statement: 'BIP-360 authors plan PQ signature verification (ML-DSA, SLH-DSA) by redefining OP_SUCCESSx opcodes; no new tapleaf
+    version needed. BIP-360 changelog 0.8.0: PQ support via opcodes or leaf version.'
+  source: delving-bip360-changes-2025-07-07
+  location: 'delvingbitcoin.org/t/changes-to-bip-360-pay-to-quantum-resistant-hash-p2qrh/1811 post #1 (E. Heilman); BIP-360
+    changelog l.429'
+  value:
+    mechanism: OP_SUCCESSx
+  confidence: M
+  verified_by_us: false
+  tags:
+  - pq-opcode
+  - plan
+  agent: E
+- id: E-010
+  statement: Tapscript sigops budget per input = 50 + serialized witness size; each executed signature opcode with non-empty
+    signature costs 50.
+  source: bip-0342
+  location: BIP-342 Resource limits l.130
+  value:
+    budget: 50 + witness_bytes
+    cost_per_sigop: 50
+  confidence: H
+  verified_by_us: false
+  tags:
+  - limits
+  - sigops
+  agent: E
+- id: E-011
+  statement: Mainnet tx 37777defed8717c581b4c0509329550e344bdc14ac38f71fc050096887e535c8 (P2TR key-path + script-path inputs)
+    has size 358, weight 727, vsize 182; script-path witness items 64/34/65 bytes (167 B serialized).
+  source: mempool.space-api, blockstream.info-api
+  location: /api/tx/37777def...e535c8 (block 709635)
+  value:
+    size: 358
+    weight: 727
+    vsize: 182
+  confidence: H
+  verified_by_us: true
+  tags:
+  - sanity-check
+  - p2tr
+  - reproduced-in-tests
+  agent: E
+- id: E-012
+  statement: Mainnet tx 6fb976ab49dcec017f1e201e84395983204ae1a7c2abf7ced0a85d692e442799 (P2TR script path, 853-byte leaf)
+    has size 1040, weight 1286, vsize 322.
+  source: mempool.space-api, blockstream.info-api
+  location: /api/tx/6fb976ab...442799 (block 767430)
+  value:
+    size: 1040
+    weight: 1286
+    vsize: 322
+  confidence: H
+  verified_by_us: true
+  tags:
+  - sanity-check
+  - p2tr
+  - reproduced-in-tests
+  agent: E
+- id: E-013
+  statement: 'Derived (GRINDSTONE model): P2MR depth-1 PQ input witness = sig + 73 bytes for sig >= 253 B with a 32-byte pubkey;
+    a 1-in-2-out all-P2MR spend is 938 / 1016 / 1165 / 237 vB for 3128 / 3440 / 4036 / 324-byte signatures.'
+  source: grindstone-kb-fees
+  location: kb/fees.py pq_input_witness_bytes, tx_vbytes
+  value:
+    witness_overhead_bytes: 73
+    vsize:
+      3128: 938
+      3440: 1016
+      4036: 1165
+      324: 237
+  confidence: M
+  verified_by_us: false
+  tags:
+  - derived
+  - fees
+  - rq4
+  agent: E
+- id: E-014
+  statement: 'Derived: per input, each signature byte costs 0.25 vB; vs 324-B SHRINCS, 3128/3440/4036-B sigs cost +701/+779/+928
+    vB = 7010/7790/9280 sats at 10 sat/vB.'
+  source: grindstone-kb-fees
+  location: kb/fees.py delta_table
+  value:
+    d_vb_vs_324:
+      3128: 701
+      3440: 779
+      4036: 928
+    d_sats_10:
+      3128: 7010
+      3440: 7790
+      4036: 9280
+  confidence: M
+  verified_by_us: false
+  tags:
+  - derived
+  - fees
+  - rq4
+  agent: E
+- id: E-015
+  statement: No merged BIP defines a special witness discount for post-quantum signatures; PQ signature bytes weigh 1 WU each
+    like any witness data.
+  source: bip-0141, bip-0360
+  location: BIP-141 weight definition; BIP-360 v0.12.1 full text (no discount)
+  value:
+    pq_witness_wu_per_byte: 1
+  confidence: M
+  verified_by_us: false
+  tags:
+  - weight
+  - open-question
+  agent: E

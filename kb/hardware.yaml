@@ -1,0 +1,254 @@
+# GRINDSTONE signer-class ladder (Agent D, "Hardware Profiler")
+# Unit: SHA-256 compressions per second (one 64-byte-block call of the compression function).
+# Compiled 2026-10-22. Derivations: kb/raw/D/report.md. Atomic claims: kb/raw/D/claims.yaml.
+#
+# kind:
+#   cited            number read directly from a primary/secondary source (unit-converted only)
+#   derived          number computed by us from cited inputs (formula in report.md); not measured
+#   measured_pending slot for our own Phase-4 measurement (E0/E5); null until measured
+# confidence: H (primary source, direct) | M (primary source + conversion/assumption) | L (scaling or sparse data)
+#
+# Conversions used:
+#   compressions/s = bytes_per_s / 64                         (bulk-throughput benchmarks)
+#   compressions/s = clock_Hz / (cycles_per_byte * 64)        (cycle-count benchmarks)
+#   hashcat mode 1400 H/s ~= compressions/s (inputs <= 55 B = 1 block); hashcat -O kernels
+#     skip a few final rounds / exploit zero message words, so a full generic compression is
+#     ~5-15% slower than the hashcat H/s figure (derate 0.85-0.95). Raw hashcat values kept below.
+#   Bulk/long-message figures are an upper bound for grinding; per-try overhead (padding,
+#     midstate copy, digest check) typically costs 10-30% on CPUs/MCUs.
+
+meta:
+  unit: sha256_compressions_per_second
+  compiled: 2026-10-22
+  agent: D
+  measured_values_present: false
+
+classes:
+
+  - id: class0a
+    name: "Class 0a - hardware-wallet MCU, software SHA-256 (Cortex-M4/M33)"
+    example_devices:
+      - "Trezor Safe 3 / Model T (STM32F4-class Cortex-M4 @ 168-180 MHz)"
+      - "BitBox02 (ATSAMD51J20A Cortex-M4F @ 120 MHz)"
+      - "Coldcard Mk4 (STM32L4-class Cortex-M4 @ 120 MHz)"
+      - "Trezor Safe 5 (STM32U585 Cortex-M33 @ 160 MHz) when HASH peripheral unused"
+    compressions_per_sec: {low: 1.1e+4, typical: 4.0e+4, high: 8.8e+4}
+    cycles_per_compression: {low_perf: 5900, typical: 3000, high_perf: 2850}
+    watts: {low: 0.05, typical: 0.15, high: 0.4}
+    watts_note: "MCU core/board estimate (tens of mA at 3.3 V); whole-device draw incl. display higher. confidence L."
+    joules_per_compression_typical: 3.8e-6
+    sources:
+      - source_url: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+        exact_location: "STM32F437 (No HW Crypto) SHA-256 2.602 MB/s @160 MHz; STM32L4A6Z (No HW Crypto, NO ASM) 847.458 KiB/s @80 MHz; STM32WB55 985 KB/s @64 MHz; STM32U585 (No STM HW Crypto) 1.970 MB/s @160 MHz"
+        date: "accessed 2026-10-22 (wolfSSL 4.4.1-5.3.1 runs)"
+      - source_url: https://www.wolfssl.com/wordpress/wp-content/uploads/2026/07/wolfSSL-vs-MbedTLS.docx.pdf
+        exact_location: "STM32H563 (Cortex-M33 @250 MHz) table: SHA-256 wolfCrypt 5488 KiB/s (Thumb2 asm), MbedTLS 3849 KiB/s"
+        date: "2026-06"
+      - source_url: https://raw.githubusercontent.com/mupq/pqm4/master/benchmarks.md
+        exact_location: "Signature Schemes speed table, sphincs-sha2-128f/128s-simple clean; Hashing Evaluation 90.7% (sign)"
+        date: "accessed 2026-10-22"
+    derivation: "typical = 120 MHz / ~3000 cycles per compression (pqm4 SPHINCS+-sha2 and Campos et al. LMS back-calculation, ~47-52 c/B); low = 64 MHz at 92 c/B; high = 180 MHz at best measured Cortex-M mainline asm 44.5 c/B."
+    date: 2026-10-22
+    confidence: M
+    kind: derived
+
+  - id: class0b
+    name: "Class 0b - hardware-wallet MCU with on-chip SHA-256 HASH peripheral"
+    example_devices:
+      - "STM32U585 (Trezor Safe 5/7) HASH peripheral, 66 cycles/block claimed"
+      - "STM32L4S5/L4A6-class HASH (Coldcard-class MCUs)"
+      - "STM32F437/F439 HASH"
+    compressions_per_sec: {low: 1.16e+5, typical: 1.2e+5, high: 2.4e+6}
+    watts: {low: 0.05, typical: 0.15, high: 0.4}
+    joules_per_compression_typical: 1.3e-6
+    sources:
+      - source_url: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+        exact_location: "STM32F437 (STM Crypto/Hash Acceleration) SHA-256 7.446 MB/s @160 MHz; STM32L4A6Z (HW) 7.104 MiB/s @80 MHz; STM32U585 (HW, SP Math ASM) 7.910 MB/s @160 MHz; STM32H563ZI (Hash) 20.703 MiB/s @250 MHz"
+        date: "accessed 2026-10-22"
+      - source_url: https://github.com/trezor/trezor-firmware/issues/3638
+        exact_location: "Issue body: STM32U5 HASH 'claim 66 clock cycles for processing one 512-bit block' (citing RM0456 ch. 51)"
+        date: "2024-03-22"
+    derivation: "low/typical = measured library throughput (bus/FIFO-feed bound, ~116-130k/s on 80-160 MHz parts); high = theoretical 160 MHz / 66 cycles = 2.42M/s, not achievable once context save/restore per grind try is included. Grinding with short messages likely sits near the low end."
+    date: 2026-10-22
+    confidence: M
+    kind: derived
+
+  - id: class0c
+    name: "Class 0c - discrete secure element doing the hashing (I2C)"
+    example_devices:
+      - "Microchip ATECC608A/B (BitBox02, Coldcard SE1)"
+      - "Ledger ST33K1M5 (no public SHA-256 throughput figures; left null)"
+    compressions_per_sec: {low: 2.0e+1, typical: 1.5e+2, high: 1.5e+3}
+    watts: {low: 0.003, typical: 0.01, high: 0.05}
+    sources:
+      - source_url: https://eprint.iacr.org/2021/058.pdf
+        exact_location: "Fig. 2 and text: ATECC608A 'operates three orders of magnitude' slower than on-chip accelerators; SHA-256 dominated by I2C transfer"
+        date: "2021-02-13"
+      - source_url: https://www.mouser.com/datasheet/2/268/ATECC608B_CryptoAuthentication_Device_Summary_Data-3555216.pdf
+        exact_location: "I2C timing table: fSCL max 1 MHz; ICC 2-3 mA during non-ECC commands"
+        date: "2025-01-29"
+    derivation: "high = I2C bus bound: 1 MHz x ~71 bytes x 9 bits per 64-byte block -> <=1.56k blocks/s; typical/low reflect 400 kHz bus + command latency/polling. Grinding in a discrete SE is not realistic; included only to bound the ladder."
+    date: 2026-10-22
+    confidence: L
+    kind: derived
+
+  - id: class1a
+    name: "Class 1a - Cortex-A72, no ARMv8 crypto extensions (Raspberry Pi 4)"
+    example_devices: ["Raspberry Pi 4B (BCM2711, 4x A72 @ 1.5-1.8 GHz)"]
+    compressions_per_sec: {low: 2.07e+6, typical: 8.3e+6, high: 9.9e+6}
+    per_core: {at_1500MHz: 2.07e+6, at_1800MHz: 2.48e+6}
+    watts: {low: 6.4, typical: 6.8, high: 7.6}
+    joules_per_compression_typical: 8.2e-7
+    sources:
+      - source_url: https://bench.cr.yp.to/results-nistlwc-hash/aarch64-pi4b.html
+        exact_location: "Cycles/byte for long messages: sha256 median 11.34 (supercop-20251114)"
+        date: "accessed 2026-10-22"
+      - source_url: http://bench.cr.yp.to/results-hash/aarch64-pi4b.html
+        exact_location: "Cycles/byte for 64 bytes: sha256 median 27.31 (= 874 cycles per compression, 2 blocks incl. padding)"
+        date: "supercop-20260330"
+      - source_url: https://www.pidramble.com/wiki/benchmarks/power-consumption.html
+        exact_location: "Raspberry Pi 4 B: 400% CPU load (stress --cpu 4) 1280 mA (6.4 W)"
+        date: "accessed 2026-10-22"
+    derivation: "725.8 cycles/compression; low = 1 core @1.5 GHz; typical = 4 cores @1.5 GHz (8.3M/s); high = 4 cores @1.8 GHz (9.9M/s)."
+    date: 2026-10-22
+    confidence: H
+    kind: derived
+
+  - id: class1b
+    name: "Class 1b - Cortex-A76 with ARMv8 SHA2 instructions (Raspberry Pi 5)"
+    example_devices: ["Raspberry Pi 5 (BCM2712, 4x A76 @ 2.4 GHz)"]
+    compressions_per_sec: {low: 1.85e+7, typical: 7.4e+7, high: 9.6e+7}
+    per_core: {supercop_2.03cpb_at_2400MHz: 1.85e+7, wolfcrypt_1464MiBps: 2.40e+7}
+    watts: {low: 7.0, typical: 8.8, high: 12.0}
+    joules_per_compression_typical: 1.2e-7
+    sources:
+      - source_url: http://bench.cr.yp.to/results-hash/aarch64-pi5.html
+        exact_location: "Cycles/byte for long messages: sha256 median 2.03; 64-byte messages 4.25 (supercop-20251222)"
+        date: "accessed 2026-10-22"
+      - source_url: https://www.wolfssl.com/wordpress/wp-content/uploads/2026/07/wolfSSL-vs-MbedTLS.docx.pdf
+        exact_location: "Raspberry Pi 5 (Cortex-A76 @ 2.4 GHz) table: SHA-256 wolfCrypt 1464 MiB/s, MbedTLS 205 MiB/s"
+        date: "2026-06"
+      - source_url: https://raspberry.tips/en/raspberrypi-tutorials/raspberry-pi-power-consumption-update-2026-all-models-compared
+        exact_location: "Pi 5 measured table: 'CPU Full Load all 4 cores (stress) ~8.8 W'"
+        date: "accessed 2026-10-22"
+    derivation: "130 cycles/compression (SUPERCOP) or ~100 (wolfCrypt); low = 1 core SUPERCOP; typical = 4 cores SUPERCOP @2.4 GHz; high = 4 cores wolfCrypt rate. Without active cooling Pi 5 throttles to 1.5 GHz (-37%)."
+    date: 2026-10-22
+    confidence: H
+    kind: derived
+
+  - id: class2
+    name: "Class 2 - laptop CPU with SHA-NI"
+    example_devices: ["Intel Core i5-13420H (our machine, 4P+4E, 45 W)", "i7-13700H", "i3-12100", "i9-11950H"]
+    measured:
+      device: "Intel Core i5-13420H, MSI Thin 15 B13VE (plan section 4.0)"
+      compressions_per_sec: null
+      watts: null
+      kind: measured_pending
+      experiment: E5
+    cited_comparables:
+      compressions_per_sec_per_core: {low: 1.25e+7, typical: 2.8e+7, high: 3.5e+7}
+      notes: "low = OpenSSL one-shot API ~80 ns/block incl. call overhead (Ice Lake-SP); typical = wolfCrypt i9-11950H 1703 MiB/s; high = SUPERCOP Raptor Cove 2.05 c/B at 4.6 GHz."
+    compressions_per_sec: {low: 1.0e+8, typical: 1.8e+8, high: 2.3e+8}
+    watts: {low: 35, typical: 45, high: 95}
+    joules_per_compression_typical: 2.5e-7
+    sources:
+      - source_url: http://bench.cr.yp.to/results-hash/amd64-raptor.html
+        exact_location: "i7-13700H P cores: sha256 long-message median 2.05 c/B; 64-byte 4.69 c/B (supercop-20231107)"
+        date: "accessed 2026-10-22"
+      - source_url: http://bench.cr.yp.to/results-hash/amd64-alder2,little.html
+        exact_location: "i3-1215U Gracemont E cores: sha256 long-message median 2.05 c/B; 64-byte 4.41 c/B"
+        date: "supercop-20260627"
+      - source_url: https://www.wolfssl.com/wordpress/wp-content/uploads/2026/07/wolfSSL-vs-MbedTLS.docx.pdf
+        exact_location: "Intel i9-11950H table: SHA-256 wolfCrypt 1703 MiB/s (SHA extensions), MbedTLS 340 MiB/s"
+        date: "2026-06"
+      - source_url: https://github.com/hsw/openssl-sha256-bench
+        exact_location: "README: 'On SHA-NI hardware, one 64-byte SHA-256 block compresses in roughly 80 ns.' (Xeon Gold 5318Y)"
+        date: "2026-04"
+    derivation: "131 cycles/compression on both P (Raptor Cove) and E (Gracemont) cores. i5-13420H all-core estimate: 4P x 3.5-4.2 GHz + 4E x 2.6-3.0 GHz -> ~185-225M/s bulk; sustained-45 W and per-try overhead give ~100-230M/s, typical 180M/s. Replace with E5 measurement."
+    date: 2026-10-22
+    confidence: M
+    kind: derived
+
+  - id: class3
+    name: "Class 3 - consumer GPU"
+    example_devices: ["RTX 4050 Laptop @ 45 W (our machine)", "RTX 4060", "RTX 4070", "RTX 4090"]
+    measured:
+      device: "NVIDIA RTX 4050 Laptop @ 45 W TGP (20 SM, max boost 1605 MHz)"
+      compressions_per_sec: null
+      watts: null
+      kind: measured_pending
+      experiment: E0
+    estimate_rtx4050_laptop_45W:
+      compressions_per_sec: {low: 1.3e+9, typical: 1.8e+9, high: 2.1e+9}
+      kind: derived
+      confidence: L
+      derivation: "~65M hashcat-1400 H/s per SM per GHz (fit across 4060/4070/4090) x 20 SM x 1.2-1.6 GHz, x0.85-0.95 hashcat derate for low/typical. No public hashcat run for any Ada laptop GPU was found."
+    cited_hashcat_mode1400_Hps:
+      rtx4060_desktop: {value: 4.04e+9, alt: 4.11e+9, tgp_W: 115}
+      rtx4070_desktop: {value: 7.83e+9, tgp_W: 200}
+      rtx4070ti_super: {value: 1.095e+10, tgp_W: 285}
+      rtx4090_desktop: {value: 2.198e+10, range: [2.119e+10, 2.198e+10], tgp_W: 450}
+      rtx5090_desktop: {value: 2.719e+10, tgp_W: 575}
+    compressions_per_sec: {low: 1.3e+9, typical: 4.0e+9, high: 2.2e+10}
+    watts: {low: 45, typical: 115, high: 450}
+    joules_per_compression_typical: 2.9e-8
+    sources:
+      - source_url: https://github.com/0x3444/hashcat_benchmarks/blob/main/NVIDIA_GeForce_RTX_4060.txt
+        exact_location: "Hash-Mode 1400 (SHA2-256) Speed.#1 4037.5 MH/s (hashcat 6.2.6, OpenCL)"
+        date: "accessed 2026-10-22"
+      - source_url: https://gist.github.com/desterhuizen/010addc5b07e+394f49e+7b960796e+51e+1
+        exact_location: "Hash-Mode 1400 Speed.#1 4108.8 MH/s (RTX 4060, hashcat 6.2.5 -O, CUDA 12.6)"
+        date: "accessed 2026-10-22"
+      - source_url: https://hashcat.net/forum/archive/index.php?thread-11394.html
+        exact_location: "RTX 4070, Hash-Mode 1400 Speed.#1 7828.4 MH/s (hashcat 6.2.6)"
+        date: "2023-04-21"
+      - source_url: https://gist.github.com/Chick3nman/32e+662a5bb63bc4f51b847bb422222fd
+        exact_location: "RTX 4090 (Asus Strix, stock), Hash-Mode 1400 21975.5 MH/s (hashcat 6.2.6, CUDA 11.8)"
+        date: "2022-10"
+      - source_url: https://hashcat.net/forum/archive/index.php?thread-11001.html
+        exact_location: "post 12-29-2022 lionbladerunner, RTX 4090 Hash-Mode 1400 21188.1 MH/s"
+        date: "2022-12-29"
+    derivation: "low = our RTX 4050L@45W estimate; typical = RTX 4060 desktop; high = RTX 4090. Raw hashcat values; apply 0.85-0.95 derate for a full generic compression."
+    date: 2026-10-22
+    confidence: M
+    kind: cited
+
+  - id: class4
+    name: "Class 4 - co-signing server / multi-GPU"
+    example_devices: ["8x RTX 4090 rig", "4-8x H100 SXM/PCIe", "8x RTX 5090 rig"]
+    per_gpu_hashcat_mode1400_Hps:
+      rtx4090: {value: 2.15e+10, watts: 450}
+      h100_sxm: {value: 1.649e+10, watts: 700}
+      h100_pcie: {value: 1.254e+10, watts: 350}
+    compressions_per_sec: {low: 1.25e+10, typical: 1.72e+11, high: 2.18e+11}
+    watts: {low: 350, typical: 4000, high: 5500}
+    joules_per_compression_typical: 2.3e-8
+    sources:
+      - source_url: https://www.onlinehashcrack.com/tools-benchmark-hashcat-nvidia-rtx-4090.php
+        exact_location: "Benchmark hashcat 6.2.6 on 8 * RTX 4090 (-O -w 4): 'Per card ... 21.5 GH/s on SHA2-256'"
+        date: "page dated 2026-10-22 (run date not stated)"
+      - source_url: https://www.onlinehashcrack.com/tools-benchmark-hashcat-nvidia-H100-SXM.php
+        exact_location: "4 * H100 SXM 80GB, hashcat 6.2.6 -O -w 4, Hash-Mode 1400: per GPU ~16.43-16.55 GH/s, Speed.#* 65963.4 MH/s"
+        date: "accessed 2026-10-22"
+      - source_url: https://www.onlinehashcrack.com/tools-benchmark-hashcat-nvidia-H100-PCIE.php
+        exact_location: "4 * H100 PCIe, Hash-Mode 1400: per GPU ~12.51-12.56 GH/s, Speed.#* 50179.6 MH/s"
+        date: "accessed 2026-10-22"
+      - source_url: https://hashcat.net/forum/archive/index.php?thread-12487.html
+        exact_location: "[Benchmark] GeForce RTX 5090: 1400 (SHA2-256) 27190.7 MH/s"
+        date: "2025-01-28"
+    derivation: "low = single H100 PCIe; typical = 8 x 21.5 GH/s (8x RTX 4090) = 172 GH/s; high = 8 x 27.19 GH/s (8x RTX 5090, scaled from single-card figure). Watts = GPU board power x N plus ~0.4-0.6 kW host."
+    date: 2026-10-22
+    confidence: M
+    kind: cited
+
+cross_checks:
+  pqm4_sphincs_cortex_m4:
+    source_url: https://raw.githubusercontent.com/mupq/pqm4/master/benchmarks.md
+    exact_location: "Signature Schemes speed table; Hashing Evaluation table"
+    note: "cycle counts measured at 24 MHz (no flash wait states); 'clean' PQClean implementation with SUPERCOP C SHA-256"
+    sphincs_sha2_128f_simple: {keygen_cycles: 15742990, sign_cycles: 368575228, verify_cycles: 21923628, hashing_share_sign: 0.907}
+    sphincs_sha2_128s_simple: {keygen_cycles: 1007731522, sign_cycles: 7657558168, verify_cycles: 7471794, hashing_share_sign: 0.907}
+    derived_cycles_per_compression: {sha2_128f: 2950, sha2_128s: 3128}
+    derived_sign_seconds_at_120MHz: {sha2_128f: 3.07, sha2_128s: 63.8}
+    kind: derived
+    confidence: M

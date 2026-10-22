@@ -1,0 +1,16 @@
+id: shrincs-bip-draft
+title: 'SHRINCS: A Compact Hash-Based Signature Scheme (draft BIP)'
+authors:
+- conduition
+- Ethan Heilman
+- Mikhail Kudinov
+- Oleksandr Kurbatov
+- Jonas Nick
+- remix7531
+venue: GitHub SHRINCS/shrincs-bip
+date: 2026-08-26
+url: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md
+type: code
+trust: primary
+notes: Living document. Read at commit 2d1679b25b (2026-10-18). Numbers sit in CONST
+  templates and may change.

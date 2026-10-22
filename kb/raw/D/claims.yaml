@@ -1,0 +1,315 @@
+# Agent D atomic claims (compiled 2026-10-22). Schema per plan section 3.3.
+# All values unit-converted only where stated; derived values are flagged in tags.
+claims:
+  - id: D-C001
+    statement: "pqm4 sphincs-sha2-128f-simple (clean) signing takes 368,575,228 cycles on Cortex-M4 (avg of 10)."
+    source: https://raw.githubusercontent.com/mupq/pqm4/master/benchmarks.md
+    location: "Speed Evaluation > Signature Schemes table, row sphincs-sha2-128f-simple clean"
+    value: {sign_cycles: 368575228, keygen_cycles: 15742990, verify_cycles: 21923628, clock_note: "measured at 24 MHz"}
+    confidence: H
+    verified_by_us: false
+    tags: [class0, pqm4, sphincs, cross-check, cited]
+  - id: D-C002
+    statement: "pqm4 sphincs-sha2-128s-simple (clean) signing takes 7,657,558,168 cycles on Cortex-M4 (avg of 10)."
+    source: https://raw.githubusercontent.com/mupq/pqm4/master/benchmarks.md
+    location: "Speed Evaluation > Signature Schemes table, row sphincs-sha2-128s-simple clean"
+    value: {sign_cycles: 7657558168, keygen_cycles: 1007731522, verify_cycles: 7471794}
+    confidence: H
+    verified_by_us: false
+    tags: [class0, pqm4, sphincs, cross-check, cited]
+  - id: D-C003
+    statement: "In pqm4, ~90.7% of SPHINCS+-sha2-128f/128s signing cycles are spent in SHA-2."
+    source: https://raw.githubusercontent.com/mupq/pqm4/master/benchmarks.md
+    location: "Hashing Evaluation > Signature Schemes table, rows sphincs-sha2-128f/128s-simple (sign column 90.7%)"
+    value: {hashing_share_sign: 0.907}
+    confidence: H
+    verified_by_us: false
+    tags: [class0, pqm4, cited]
+  - id: D-C004
+    statement: "pqm4 cycle counts are obtained at 24 MHz to avoid flash wait states."
+    source: https://github.com/mupq/pqm4
+    location: "README, benchmarking section"
+    value: {clock_MHz: 24}
+    confidence: H
+    verified_by_us: false
+    tags: [class0, pqm4, methodology, cited]
+  - id: D-C005
+    statement: "Back-calculated from D-C001..3, one SHA-256 compression (incl. per-call overhead) costs ~2,950 (128f) to ~3,130 (128s) Cortex-M4 cycles in pqm4 clean SPHINCS+."
+    source: derived (kb/raw/D report section 7)
+    location: "compressions per signature: 128f ~113.3k, 128s ~2.22M (1 comp per F/H/PRF with seeded midstate; T_len = 10 blocks)"
+    value: {cycles_per_compression_128f: 2950, cycles_per_compression_128s: 3128}
+    confidence: M
+    verified_by_us: false
+    tags: [class0, derived, cross-check]
+  - id: D-C006
+    statement: "LMS (SHA-256, w=16, h=5) key generation takes 117,988,963 cycles on an STM32F4DISCOVERY Cortex-M4."
+    source: https://pmc.ncbi.nlm.nih.gov/articles/PMC7334983
+    location: "Campos, Kohlstadt, Reith, Stoettinger, AFRICACRYPT 2020, Table 4 row 'LMS SHA-256 16 5 1'"
+    value: {keygen_cycles: 117988963}
+    confidence: H
+    verified_by_us: false
+    tags: [class0, lms, cited]
+  - id: D-C007
+    statement: "Dividing D-C006 by ~35,487 compressions gives ~3,325 cycles per SHA-256 compression on Cortex-M4."
+    source: derived
+    location: "32 leaves x (67 chains x 15 + 67 PRF + 35 pubkey-hash blocks + 1) + 31 tree nodes"
+    value: {cycles_per_compression: 3325}
+    confidence: M
+    verified_by_us: false
+    tags: [class0, derived, cross-check]
+  - id: D-C008
+    statement: "wolfSSL measures software SHA-256 at 2.602 MB/s on STM32F437 (Cortex-M4 @160 MHz, -Os, no HW crypto)."
+    source: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+    location: "STM32F437 (No HW Crypto, -Os, FastMath), SHA-256 line"
+    value: {bytes_per_s: 2.602e+6, clock_MHz: 160, compressions_per_s: 4.07e+4, cycles_per_byte: 61.5}
+    confidence: H
+    verified_by_us: false
+    tags: [class0a, cited]
+  - id: D-C009
+    statement: "wolfSSL measures software SHA-256 at 847.458 KiB/s on STM32L4A6Z (Cortex-M4 @80 MHz, no asm)."
+    source: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+    location: "STM32L4A6Z (No HW Crypto, SP Math All NO ASM), SHA-256 line"
+    value: {bytes_per_s: 867797, clock_MHz: 80, compressions_per_s: 1.36e+4, cycles_per_byte: 92.2}
+    confidence: H
+    verified_by_us: false
+    tags: [class0a, cited]
+  - id: D-C010
+    statement: "wolfSSL measures SHA-256 at 985 KB/s on STM32WB55 (Cortex-M4 @64 MHz), identical with and without HW hash enabled."
+    source: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+    location: "STM32WB55 sections, SHA-256 lines"
+    value: {bytes_per_s: 985222, clock_MHz: 64, compressions_per_s: 1.54e+4}
+    confidence: H
+    verified_by_us: false
+    tags: [class0a, cited]
+  - id: D-C011
+    statement: "wolfCrypt Thumb2-asm SHA-256 runs at 5488 KiB/s and MbedTLS at 3849 KiB/s on STM32H563 (Cortex-M33 @250 MHz, no HW crypto)."
+    source: https://www.wolfssl.com/wordpress/wp-content/uploads/2026/07/wolfSSL-vs-MbedTLS.docx.pdf
+    location: "Section 'STM32H563 (Cortex-M33 @ 250 MHz, bare metal)', results table, SHA-256 row"
+    value: {wolfcrypt_KiBps: 5488, mbedtls_KiBps: 3849, cycles_per_byte_wolf: 44.5, cycles_per_byte_mbed: 63.4, compressions_per_s_wolf: 8.78e+4}
+    confidence: H
+    verified_by_us: false
+    tags: [class0a, cited, 2026]
+  - id: D-C012
+    statement: "STM32 HASH-peripheral SHA-256 measured by wolfSSL: STM32F437 7.446 MB/s @160 MHz, STM32L4A6Z 7.104 MiB/s @80 MHz, STM32U585 7.910 MB/s @160 MHz, STM32H563 20.703 MiB/s @250 MHz."
+    source: https://github.com/wolfSSL/wolfssl/blob/master/IDE/STM32Cube/STM32_Benchmarks.md
+    location: "Sections with 'STM Crypto/Hash Acceleration' / 'Symmetric AES/SHA acceleration' / 'RNG and Hash', SHA-256 lines"
+    value: {f437_cps: 1.16e+5, l4a6_cps: 1.16e+5, u585_cps: 1.24e+5, h563_cps: 3.39e+5}
+    confidence: H
+    verified_by_us: false
+    tags: [class0b, cited]
+  - id: D-C013
+    statement: "STM32U5 HASH peripheral is claimed to process one 512-bit SHA-256 block in 66 clock cycles (RM0456 ch. 51); Trezor had not used it as of the issue."
+    source: https://github.com/trezor/trezor-firmware/issues/3638
+    location: "Issue #3638 description"
+    value: {cycles_per_block: 66, theoretical_cps_at_160MHz: 2.42e+6}
+    confidence: M
+    verified_by_us: false
+    tags: [class0b, trezor, cited]
+  - id: D-C014
+    statement: "Trezor Safe 7 uses STM32U5 MCU plus TROPIC01 and OPTIGA Trust M secure elements; Safe 3 and Safe 5 include a secure element."
+    source: https://trezor.io/ja/learn/security-privacy/how-trezor-keeps-you-safe/trezor-safe-device-authentication-check
+    location: "Page body"
+    value: {mcu: STM32U5}
+    confidence: H
+    verified_by_us: false
+    tags: [class0, devices, cited]
+  - id: D-C015
+    statement: "BitBox02 uses an ATSAMD51J20A MCU and ATECC608B secure element."
+    source: https://www.etherbit.in/compare/wallets/bitbox02-vs-blockstream-jade
+    location: "Comparison table: Controllers / Secure Elements"
+    value: {mcu: ATSAMD51J20A, se: ATECC608B}
+    confidence: M
+    verified_by_us: false
+    tags: [class0, devices, cited, secondary]
+  - id: D-C016
+    statement: "Coldcard Mk4 and Q have two secure elements: Microchip ATECC608 and Maxim DS28C36B."
+    source: https://github.com/Coldcard/firmware/blob/master/docs/secure-elements.md
+    location: "Dual Secure Elements > Background"
+    value: {se1: ATECC608, se2: DS28C36B}
+    confidence: H
+    verified_by_us: false
+    tags: [class0, devices, cited]
+  - id: D-C017
+    statement: "Ledger Nano S Plus uses an ST33K1M5 secure element chip."
+    source: https://shop.ledger.com/products/ledger-nano-s-plus
+    location: "Specs: Security"
+    value: {se: ST33K1M5}
+    confidence: H
+    verified_by_us: false
+    tags: [class0, devices, cited]
+  - id: D-C018
+    statement: "ATECC608 I2C SCL clock is at most 1 MHz, bounding a 64-byte SHA block transfer to >= ~0.64 ms (<= ~1.56k blocks/s)."
+    source: https://www.mouser.com/datasheet/2/268/ATECC608B_CryptoAuthentication_Device_Summary_Data-3555216.pdf
+    location: "I2C AC parameters table, fSCL max 1 MHz (bound derived by us)"
+    value: {fSCL_max_Hz: 1.0e+6, max_blocks_per_s_derived: 1560}
+    confidence: M
+    verified_by_us: false
+    tags: [class0c, cited, derived]
+  - id: D-C019
+    statement: "The external ATECC608A runs crypto operations about three orders of magnitude slower than on-chip MCU accelerators."
+    source: https://eprint.iacr.org/2021/058.pdf
+    location: "Section on processing time, Fig. 2 discussion"
+    value: {relative_slowdown: "~1000x"}
+    confidence: M
+    verified_by_us: false
+    tags: [class0c, cited]
+  - id: D-C020
+    statement: "SUPERCOP measures sha256 at 11.34 cycles/byte (long messages, median) on Raspberry Pi 4 (Cortex-A72)."
+    source: https://bench.cr.yp.to/results-nistlwc-hash/aarch64-pi4b.html
+    location: "Cycles/byte for long messages, row sha256 (supercop-20251114)"
+    value: {cycles_per_byte: 11.34, cycles_per_compression: 726, cps_per_core_1500MHz: 2.07e+6}
+    confidence: H
+    verified_by_us: false
+    tags: [class1, pi4, cited]
+  - id: D-C021
+    statement: "SUPERCOP measures sha256 at 27.31 cycles/byte for 64-byte messages on Raspberry Pi 4."
+    source: http://bench.cr.yp.to/results-hash/aarch64-pi4b.html
+    location: "Cycles/byte for 64 bytes, row sha256 (supercop-20260330)"
+    value: {cycles_per_byte_64B: 27.31}
+    confidence: H
+    verified_by_us: false
+    tags: [class1, pi4, cited]
+  - id: D-C022
+    statement: "SUPERCOP measures sha256 at 2.03 cycles/byte (long) and 4.25 cycles/byte (64-byte msg) on Raspberry Pi 5 (Cortex-A76)."
+    source: http://bench.cr.yp.to/results-hash/aarch64-pi5.html
+    location: "Cycles/byte for long messages and for 64 bytes, rows sha256 (supercop-20251222)"
+    value: {cycles_per_byte_long: 2.03, cycles_per_byte_64B: 4.25, cps_per_core_2400MHz: 1.85e+7}
+    confidence: H
+    verified_by_us: false
+    tags: [class1, pi5, cited]
+  - id: D-C023
+    statement: "wolfCrypt SHA-256 runs at 1464 MiB/s and MbedTLS at 205 MiB/s on Raspberry Pi 5 (Cortex-A76 @2.4 GHz)."
+    source: https://www.wolfssl.com/wordpress/wp-content/uploads/2026/07/wolfSSL-vs-MbedTLS.docx.pdf
+    location: "Section 'ARM Raspberry Pi 5', results table, SHA-256 row"
+    value: {wolfcrypt_MiBps: 1464, mbedtls_MiBps: 205, cps_wolf_per_core: 2.40e+7}
+    confidence: H
+    verified_by_us: false
+    tags: [class1, pi5, cited, 2026]
+  - id: D-C024
+    statement: "Raspberry Pi 4 B draws 1280 mA (6.4 W) under 400% CPU load (stress --cpu 4)."
+    source: https://www.pidramble.com/wiki/benchmarks/power-consumption.html
+    location: "Raspberry Pi 4 B table"
+    value: {watts: 6.4}
+    confidence: M
+    verified_by_us: false
+    tags: [class1, power, cited]
+  - id: D-C025
+    statement: "Raspberry Pi 5 draws ~8.8 W at full 4-core CPU load (stress); other reports give 7-11.2 W."
+    source: https://raspberry.tips/en/raspberrypi-tutorials/raspberry-pi-power-consumption-update-2026-all-models-compared
+    location: "Measured Values by Scenario table: 'CPU Full Load all 4 cores (stress) ~8.8 W'"
+    value: {watts: 8.8, range: [7.0, 11.2]}
+    confidence: M
+    verified_by_us: false
+    tags: [class1, power, cited, secondary]
+  - id: D-C026
+    statement: "SUPERCOP measures sha256 at 2.05 cycles/byte (long) and 4.69 cycles/byte (64-byte msg) on Intel Core i7-13700H P cores (Raptor Cove)."
+    source: http://bench.cr.yp.to/results-hash/amd64-raptor.html
+    location: "Cycles/byte for long messages / for 64 bytes, rows sha256 (supercop-20231107)"
+    value: {cycles_per_byte_long: 2.05, cycles_per_byte_64B: 4.69, cycles_per_compression: 131, cps_per_core_4600MHz: 3.51e+7}
+    confidence: H
+    verified_by_us: false
+    tags: [class2, sha-ni, cited]
+  - id: D-C027
+    statement: "SUPERCOP measures sha256 at 2.05 cycles/byte (long) on Golden Cove (i3-12100) and on Gracemont E cores (i3-1215U)."
+    source: http://bench.cr.yp.to/results-hash/amd64-alder2,little.html
+    location: "Cycles/byte for long messages, row sha256; also results-hash/amd64-alder.html"
+    value: {cycles_per_byte_long: 2.05}
+    confidence: H
+    verified_by_us: false
+    tags: [class2, sha-ni, cited]
+  - id: D-C028
+    statement: "wolfCrypt SHA-256 (SHA extensions) runs at 1703 MiB/s on Intel i9-11950H; MbedTLS at 340 MiB/s."
+    source: https://www.wolfssl.com/wordpress/wp-content/uploads/2026/07/wolfSSL-vs-MbedTLS.docx.pdf
+    location: "Section 'Intel i9-11950H (x86_64)', results table, SHA-256 row"
+    value: {wolfcrypt_MiBps: 1703, cps_per_core: 2.79e+7}
+    confidence: H
+    verified_by_us: false
+    tags: [class2, sha-ni, cited, 2026]
+  - id: D-C029
+    statement: "On SHA-NI hardware (Xeon Gold 5318Y), one 64-byte SHA-256 block via OpenSSL one-shot APIs takes roughly 80 ns."
+    source: https://github.com/hsw/openssl-sha256-bench
+    location: "README, dispatch section"
+    value: {ns_per_block: 80, cps_per_core: 1.25e+7}
+    confidence: M
+    verified_by_us: false
+    tags: [class2, openssl, cited]
+  - id: D-C030
+    statement: "An `openssl speed -evp sha256` example (OpenSSL 3.0.13, unnamed SHA-NI x86) reports 1,542,575.45k bytes/s at 16 KB blocks."
+    source: https://lindevs.com/benchmark-cryptographic-algorithms-performance-using-openssl
+    location: "Example output table, sha256 row, 16384 bytes column"
+    value: {bytes_per_s: 1.5426e+9, cps: 2.41e+7}
+    confidence: L
+    verified_by_us: false
+    tags: [class2, openssl, cited, cpu-unspecified]
+  - id: D-C031
+    statement: "hashcat mode 1400 (SHA2-256) on RTX 4060 runs at 4037.5 MH/s (6.2.6, OpenCL) and 4108.8 MH/s (6.2.5 -O, CUDA)."
+    source: https://github.com/0x3444/hashcat_benchmarks/blob/main/NVIDIA_GeForce_RTX_4060.txt
+    location: "Hash-Mode 1400 Speed.#1; second run: gist desterhuizen/010addc5b07e+394f49e+7b960796e+51e+1"
+    value: {Hps: [4.0375e+9, 4.1088e+9]}
+    confidence: H
+    verified_by_us: false
+    tags: [class3, hashcat, cited]
+  - id: D-C032
+    statement: "hashcat mode 1400 on RTX 4070 runs at 7828.4 MH/s (hashcat 6.2.6)."
+    source: https://hashcat.net/forum/archive/index.php?thread-11394.html
+    location: "Post by tischenko 04-21-2023, Speed.#1 for Hash-Mode 1400"
+    value: {Hps: 7.8284e+9}
+    confidence: H
+    verified_by_us: false
+    tags: [class3, hashcat, cited]
+  - id: D-C033
+    statement: "hashcat mode 1400 on RTX 4090 runs at 21,188-21,976 MH/s across three independent runs (hashcat 6.2.6)."
+    source: https://gist.github.com/Chick3nman/32e+662a5bb63bc4f51b847bb422222fd
+    location: "Hash-Mode 1400 Speed.#1 21975.5 MH/s; also hashcat forum thread-11001 (21188.1) and thread-11277 (21791.7)"
+    value: {Hps_range: [2.1188e+10, 2.1976e+10]}
+    confidence: H
+    verified_by_us: false
+    tags: [class3, class4, hashcat, cited]
+  - id: D-C034
+    statement: "hashcat mode 1400 on RTX 5090 runs at 27,190.7 MH/s."
+    source: https://hashcat.net/forum/archive/index.php?thread-12487.html
+    location: "[Benchmark] GeForce RTX 5090, 1400 (SHA2-256) line"
+    value: {Hps: 2.71907e+10}
+    confidence: M
+    verified_by_us: false
+    tags: [class3, class4, hashcat, cited]
+  - id: D-C035
+    statement: "On an 8x RTX 4090 rig (hashcat 6.2.6 -O -w 4) SHA2-256 runs at 21.5 GH/s per card; 4x H100 SXM total 65,963.4 MH/s (~16.5 GH/s each); 4x H100 PCIe total 50,179.6 MH/s (~12.5 GH/s each)."
+    source: https://www.onlinehashcrack.com/tools-benchmark-hashcat-nvidia-rtx-4090.php
+    location: "RTX 4090 page summary; H100-SXM and H100-PCIE pages Hash-Mode 1400 Speed.#*"
+    value: {rtx4090_per_card: 2.15e+10, h100_sxm_total_4: 6.59634e+10, h100_pcie_total_4: 5.01796e+10}
+    confidence: M
+    verified_by_us: false
+    tags: [class4, hashcat, cited]
+  - id: D-C036
+    statement: "OpenBenchmarking pts/hashcat-1.3.x 'SHA-256' lists ASUS RTX 4090 at ~50.07 GH/s, >2x all direct hashcat -b outputs; unresolved conflict, not used."
+    source: https://openbenchmarking.org/test/pts/hashcat&eval=306f31f896ee6afac758df6db7589b6a2a232723
+    location: "Compatible Public Results, ASUS NVIDIA GeForce RTX 4090 row"
+    value: {Hps: 5.0067e+10}
+    confidence: L
+    verified_by_us: false
+    tags: [class3, conflict, cited]
+  - id: D-C037
+    statement: "Across RTX 4060/4070/4090, hashcat mode-1400 throughput is ~64-65M H/s per SM per GHz (assuming ~2.6-2.65 GHz sustained clocks)."
+    source: derived (from D-C031..33)
+    location: "H/s / (SM count x assumed clock)"
+    value: {Hps_per_SM_GHz: 6.5e+7}
+    confidence: M
+    verified_by_us: false
+    tags: [class3, derived, scaling]
+  - id: D-C038
+    statement: "Estimated RTX 4050 Laptop @45 W (20 SM, 1.2-1.6 GHz) throughput: 1.56-2.09 G hashcat-H/s, i.e. ~1.3-2.0 G full compressions/s (typical 1.8 G). No published Ada-laptop hashcat run was found."
+    source: derived (from D-C037 and plan section 4.0 specs)
+    location: "20 x clock x 65M x 0.85-0.95 derate"
+    value: {cps_low: 1.3e+9, cps_typical: 1.8e+9, cps_high: 2.1e+9}
+    confidence: L
+    verified_by_us: false
+    tags: [class3, derived, measured_pending, E0]
+  - id: D-C039
+    statement: "Estimated i5-13420H all-core SHA-NI throughput: ~185-220M compressions/s bulk, ~100-230M/s for grinding (typical 180M/s) at 45 W."
+    source: derived (from D-C026, D-C027)
+    location: "4P x 3.5-4.2 GHz /131 + 4E x 2.6-3.0 GHz /131, minus 10-30% per-try overhead"
+    value: {cps_low: 1.0e+8, cps_typical: 1.8e+8, cps_high: 2.3e+8}
+    confidence: M
+    verified_by_us: false
+    tags: [class2, derived, measured_pending, E5]

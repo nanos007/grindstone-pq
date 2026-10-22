@@ -1,0 +1,13 @@
+id: ml-slhdsa-perf-2025
+title: SLH-DSA (SPHINCS) Performance Optimization Techniques
+authors:
+- conduition
+venue: bitcoindev mailing list
+date: 2025-11-24
+url: https://groups.google.com/g/bitcoindev/c/LAll07BHwjw
+type: mailing-list
+trust: primary
+notes: 'UNCERTAIN: the root message (Message-ID d463887f-3a9e-48a5-b61a-8680646a370an@googlegroups.com)
+  is missing from the gnusha and b10c archives. Quotes come from the Google Groups
+  render via a fetch tool and need re-checking against the raw message. Tim Ruffing''s
+  reply is archived: https://gnusha.org/pi/bitcoindev/6ad6c7418b6b845d6e2dd0ccdb2b508de0c3c10c.camel@real-or-random.org/'

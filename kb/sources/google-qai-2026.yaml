@@ -1,0 +1,12 @@
+id: google-qai-2026
+title: Securing Elliptic Curve Cryptocurrencies against Quantum Vulnerabilities (Google
+  Quantum AI whitepaper)
+authors:
+- Google Quantum AI
+venue: whitepaper
+date: 2026-03
+url: https://quantumai.google/static/site-assets/downloads/cryptocurrency-whitepaper.pdf
+type: paper
+trust: primary
+notes: Cited on bitcoindev by conduition (2026-08-16). Not read by Agent C. Date taken
+  from the plan, unverified.

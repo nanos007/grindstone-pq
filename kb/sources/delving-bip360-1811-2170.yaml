@@ -1,0 +1,14 @@
+id: delving-bip360-1811-2170
+title: Changes to BIP-360 - Pay to Quantum Resistant Hash (P2QRH) / Major BIP 360
+  Update
+authors:
+- Hunter Beast
+- Ethan Heilman
+- others
+venue: Delving Bitcoin
+date: 2025-07-07
+url: https://delvingbitcoin.org/t/1811
+type: mailing-list
+trust: primary
+notes: Also https://delvingbitcoin.org/t/2170 (2025-12-19). Keyword scan found no
+  signer-cost, RAM or grinding content, so neither thread was used for requirements.
