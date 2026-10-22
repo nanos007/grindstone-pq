@@ -109,6 +109,25 @@ def hash_to_subset(y, t, k, h):
     return sorted(out) if len(out) == k else None
 
 
+def p_enough(t, k, h, out_bits=512):
+    """P(an attempt yields k distinct values < t), i.e. hash_to_subset does not return None.
+
+    Markov chain over the number of distinct values collected so far (KN §13.3 assumes 1)."""
+    b = (t - 1).bit_length()
+    nu = (out_bits - h) // b
+    dist = [0.0] * (k + 1)
+    dist[0] = 1.0
+    for _ in range(nu):
+        nxt = [0.0] * (k + 1)
+        nxt[k] = dist[k]
+        for j in range(k):
+            q = (t - j) / (1 << b)
+            nxt[j + 1] += dist[j] * q
+            nxt[j] += dist[j] * (1 - q)
+        dist = nxt
+    return dist[k]
+
+
 def pors_accept(y, t, k, h, m_max):
     xs = hash_to_subset(y, t, k, h)
     return xs is not None and octopus_size(xs, t) <= m_max

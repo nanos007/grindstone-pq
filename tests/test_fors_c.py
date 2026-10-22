@@ -60,6 +60,22 @@ def test_octopus_vs_bruteforce(t):
         assert fors_c.octopus_size(xs, t) == _brute_octopus(xs, t)
 
 
+# kb/constructions/grind_pseudocode.md §0 (Agent A's DP)
+@pytest.mark.parametrize("h,a,k,want", [(44, 16, 8, 1.0), (40, 14, 11, 0.998608), (36, 14, 9, 0.992219),
+                                         (33, 15, 9, 0.987414), (32, 14, 10, 0.996361),
+                                         (24, 16, 8, 1.0), (20, 15, 10, 0.993520)])
+def test_p_enough_table(h, a, k, want):
+    assert fors_c.p_enough(k << a, k, h) == pytest.approx(want, abs=1e-6)
+
+
+def test_p_enough_monte_carlo():
+    t, k, h = 3 * 2 ** 5, 10, 400  # b = 7, nu = 16: P_enough ~ 0.6
+    rng = random.Random(1)
+    n = 20000
+    hits = sum(fors_c.hash_to_subset(rng.randbytes(64), t, k, h) is not None for _ in range(n))
+    assert hits / n == pytest.approx(fors_c.p_enough(t, k, h), abs=0.015)
+
+
 cupy = pytest.importorskip("cupy")
 
 
