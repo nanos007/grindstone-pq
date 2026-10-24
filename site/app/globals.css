@@ -187,3 +187,121 @@ body {
 .prose-paper tr:last-child td {
   border-bottom: none;
 }
+
+/* Figures inside the paper (img in a paragraph, so spans styled as blocks). */
+.prose-paper .paper-figure {
+  display: block;
+  margin: 1.5rem 0 2rem;
+}
+.prose-paper .paper-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #ffffff;
+  border: 1px solid var(--color-hairline);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+}
+.prose-paper .paper-caption {
+  display: block;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--color-muted);
+  margin-top: 0.6rem;
+}
+
+/* Print: the paper page doubles as the PDF source (paper/build_pdf.py). */
+@page {
+  size: A4;
+  margin: 22mm 20mm 20mm;
+  @top-center {
+    content: "Grinding at the Edge · draft 2026-10-24";
+    font-family: var(--font-sans);
+    font-size: 8pt;
+    color: #8e8b82;
+  }
+  @bottom-center {
+    content: counter(page) " / " counter(pages);
+    font-family: var(--font-sans);
+    font-size: 8pt;
+    color: #8e8b82;
+  }
+}
+@page :first {
+  @top-center {
+    content: none;
+  }
+}
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #ffffff !important;
+  }
+  main {
+    padding-top: 0 !important;
+  }
+  section {
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+  .prose-paper {
+    font-size: 9.5pt;
+    line-height: 1.55;
+    color: #252523;
+  }
+  .prose-paper h1 {
+    font-size: 24pt;
+    margin-bottom: 0.4rem;
+  }
+  .prose-paper h2 {
+    font-size: 16pt;
+    margin: 1.6rem 0 0.6rem;
+    break-after: avoid;
+  }
+  .prose-paper h3 {
+    font-size: 10.5pt;
+    margin: 1.2rem 0 0.4rem;
+    break-after: avoid;
+  }
+  .prose-paper p,
+  .prose-paper li {
+    orphans: 3;
+    widows: 3;
+  }
+  .prose-paper .table-wrap,
+  .prose-paper .paper-figure,
+  .prose-paper blockquote,
+  .prose-paper pre {
+    break-inside: avoid;
+  }
+  .prose-paper .table-wrap {
+    overflow: visible;
+  }
+  .prose-paper table {
+    font-size: 8pt;
+  }
+  .prose-paper th,
+  .prose-paper td {
+    padding: 0.3rem 0.5rem;
+    white-space: normal;
+  }
+  .prose-paper .paper-figure img {
+    border: none;
+    padding: 0;
+    max-height: 105mm;
+    object-fit: contain;
+  }
+  .prose-paper a {
+    color: inherit;
+    text-decoration: none;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

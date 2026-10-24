@@ -37,10 +37,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Navigation />
         <main className="pt-16">
           {DRAFT && (
-            <div className="bg-surface-soft border-b border-hairline px-6 md:px-12 py-2">
+            <div className="no-print bg-surface-soft border-b border-hairline px-6 md:px-12 py-2">
               <p className="max-w-5xl mx-auto text-xs text-muted">
                 <span className="font-medium text-primary-active">Draft</span> · Results are final for run 196e7e91e907;
-                the paper is under review and not yet for distribution.
+                the paper is a draft under review.
               </p>
             </div>
           )}

@@ -1,9 +1,9 @@
 # Grinding at the Edge: Empirical Signer-Cost Distributions for Bitcoin-Tuned Hash-Based Signatures
 
-*George Nanos* · DRAFT 2026-10-24 · not for distribution before the must-fix items in §7 are closed
+*George Nanos* · DRAFT 2026-10-24 · under review; open items are listed in §7
 
 > **Draft status.** Every number in this draft comes from `analysis/out/` (run `196e7e91e907`) or from
-> `kb/claims/all_claims.yaml`. Sections marked **[TODO]** need the owner's input or the optional GPU runs.
+> `kb/claims/all_claims.yaml`.
 > Signature sizes use R = 16 B (FIPS 205, SPHINCS-Parameters HEAD); Kudinov–Nick's tables use R = 32 B and
 > are 16 B larger.
 
@@ -149,8 +149,10 @@ p (nothing fitted), tested with KS (Holm-corrected) and Anderson–Darling. Σz�
 | p99 / mean | 4.56–4.65 (theory 4.61) |
 | p99.9 / mean | 6.73–7.05 (theory 6.91) |
 
-All configs collapse onto e^(−x) when tries are divided by E[tries] (Fig. 1, `ccdf_normalized.png`). The
+All configs collapse onto e^(−x) when tries are divided by E[tries] (Fig. 1). The
 analytic model, including the P_enough correction for PORS+FP, is accurate for the mean and the shape.
+
+![Figure 1. Survival function of tries divided by E[tries] for all 37 configurations; every curve follows e^(−x).](figures/ccdf_normalized.svg)
 
 ### 4.2 What an attempt really costs (H1b)
 
@@ -201,8 +203,10 @@ p99 full signing time = model base + measured grind, divided by the class rate:
 
 ### 4.5 Frontier (RQ3, H2, OQ-2)
 
-Fig. 2 (`pareto_p99.png`) plots bytes against p99 signing work per limit. Smallest shortlisted signature
+Fig. 2 plots bytes against p99 signing work per limit. Smallest shortlisted signature
 within a p99 budget:
+
+![Figure 2. Signature bytes against p99 signing work (SHA-256 compressions) per signature limit, with the Pareto frontier and one-second and two-minute budgets of four signer classes.](figures/pareto_p99.svg)
 
 | limit | Cortex-M4, 120 s | MCU+SHA, 120 s | laptop CPU, 1 s | laptop CPU, 10 s | laptop GPU, 1 s |
 |---|---|---|---|---|---|
@@ -254,8 +258,8 @@ counter anyway, ctr-grind halves FORS+C grinding.
 
 **Overgrinding (OQ-3).** Raising the WOTS+C target S trades signer work for verifier work at fixed size. At
 w = 4, S = 96 → 128 removes a third of per-layer chain steps for about 650× more grinding. Measured
-(run `oq3-eb65c6cd81a0`, 21 configs, 10⁵–10⁶ samples each, notebook 05): every mean is within 0.26 % of
-analytic.
+(run `oq3-eb65c6cd81a0`, 21 configs, 10⁵–10⁶ samples each, notebook 05, Fig. 3): every mean is within
+0.26 % of analytic.
 - **w = 4.** S = 128 costs 1.5·10⁴ tries/layer, a p99 of 1.7 s on a software-SHA Cortex-M4. S = 140
   (−46 % chain steps) costs 6.2·10⁶ tries, a p99 of 12 min on that MCU but 0.12 s on a 12-thread laptop CPU.
 - **w = 16.** S = 240 → 304 removes 27 % of chain steps for 20× more tries, raising the MCU p99 from
@@ -263,6 +267,8 @@ analytic.
 
 Overgrinding is cheap when the signer is a PC. For a software-SHA hardware wallet at w = 4, the p99 passes
 1 s once about a third of the chain steps are removed (S ≥ 128).
+
+![Figure 3. OQ-3 overgrinding: signer p99 tries per layer against verifier chain steps, analytic (lines) and measured (crosses).](figures/oq3_tradeoff.png)
 
 ## 6. Related work
 
@@ -304,12 +310,11 @@ runner, notebooks, `python -m runner.reproduce`. Data under CC-BY-4.0, dataset S
 
 ## References
 
-[KN25] M. Kudinov, J. Nick. Hash-based Signature Schemes for Bitcoin. IACR ePrint 2025/2203.
-[SPXC] A. Hülsing, M. Kudinov, E. Ronen, E. Yogev. SPHINCS+C: Compressing SPHINCS+ With (Almost) No Cost. ePrint 2022/778.
-[FD24] S. Fluhrer, Q. Dang. Smaller SPHINCS+. ePrint 2024/018.
-[FIPS205] NIST FIPS 205, Stateless Hash-Based Digital Signature Standard, 2024.
-[BIP360] BIP-360 (P2MR), bitcoin/bips, merged 2026-02-11.
-[SHRINCS] SHRINCS BIP draft, github.com/SHRINCS/shrincs-bip, commit 2d1679b.
-[REPO] BlockstreamResearch/SPHINCS-Parameters, commit ceee8ed.
-[AK] M. Abri, J. Katz. Shorter Hash-Based Signatures Using Forced Pruning. IACR ePrint 2025/2069.
-Tooling: github.com/MehdiAbri/PORS-FP.
+- [KN25] M. Kudinov, J. Nick. Hash-based Signature Schemes for Bitcoin. IACR ePrint 2025/2203.
+- [SPXC] A. Hülsing, M. Kudinov, E. Ronen, E. Yogev. SPHINCS+C: Compressing SPHINCS+ With (Almost) No Cost. ePrint 2022/778.
+- [FD24] S. Fluhrer, Q. Dang. Smaller SPHINCS+. ePrint 2024/018.
+- [FIPS205] NIST FIPS 205, Stateless Hash-Based Digital Signature Standard, 2024.
+- [BIP360] BIP-360 (P2MR), bitcoin/bips, merged 2026-02-11.
+- [SHRINCS] SHRINCS BIP draft, github.com/SHRINCS/shrincs-bip, commit 2d1679b.
+- [REPO] BlockstreamResearch/SPHINCS-Parameters, commit ceee8ed.
+- [AK] M. Abri, J. Katz. Shorter Hash-Based Signatures Using Forced Pruning. IACR ePrint 2025/2069. Tooling: github.com/MehdiAbri/PORS-FP.

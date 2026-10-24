@@ -12,7 +12,7 @@ tails included, for the parameter sets of Kudinov–Nick (ePrint 2025/2203) and 
 - Plan and research questions: `btc-pq-grinding-project.md` (kept outside this repository)
 - Results: [`analysis/README.md`](analysis/README.md) (headline numbers) and `analysis/*.ipynb`
 - Threats to validity: [`kb/threats_to_validity.md`](kb/threats_to_validity.md)
-- Paper draft: [`paper/`](paper/)
+- Paper draft: [`paper/paper.md`](paper/paper.md), PDF [`paper/grindstone-paper.pdf`](paper/grindstone-paper.pdf) (`python paper/build_pdf.py` after `npm run build` in `site/`)
 
 ## Headline results (run `196e7e91e907`, RTX 4050 Laptop @ 45 W)
 

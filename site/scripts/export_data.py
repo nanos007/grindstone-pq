@@ -100,5 +100,6 @@ data = {
 json.dump(data, open(SITE / "content" / "data.json", "w", encoding="utf-8"), indent=1)
 for name in ("paper.md", "executive_summary.md"):
     shutil.copy(ROOT / "paper" / name, SITE / "content" / name)
+shutil.copytree(ROOT / "paper" / "figures", SITE / "public" / "figures", dirs_exist_ok=True)
 print(f"wrote site/content/data.json: {len(validation)} configs, {len(oq3)} oq3, {len(params)} params, "
       f"{len(ladder)} classes; sum z^2 = {z2:.1f}")

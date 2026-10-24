@@ -4,7 +4,9 @@ import { join } from "node:path";
 import { isValidElement, type ReactNode } from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Download } from "lucide-react";
 import SectionBand from "@/components/ui/SectionBand";
+import { BASE_PATH, PAPER_PDF } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Paper (draft)",
@@ -36,6 +38,14 @@ const components: Components = {
       <table>{children}</table>
     </div>
   ),
+  // paper.md references figures/… relative to paper/; the site serves them from public/figures.
+  img: ({ src, alt }) => (
+    <span className="paper-figure">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={`${BASE_PATH}/${String(src).replace(/^\.?\//, "")}`} alt={alt ?? ""} loading="lazy" />
+      {alt && <span className="paper-caption">{alt}</span>}
+    </span>
+  ),
   a: ({ href, children }) => (
     <a href={href} target={href?.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
       {children}
@@ -51,8 +61,14 @@ export default function Paper() {
   return (
     <SectionBand className="!pt-16">
       <div className="grid lg:grid-cols-[200px_1fr] gap-12">
-        <nav aria-label="Paper contents" className="hidden lg:block">
+        <nav aria-label="Paper contents" className="hidden lg:block no-print">
           <div className="sticky top-24">
+            <a
+              href={`${BASE_PATH}/${PAPER_PDF}`}
+              className="inline-flex items-center gap-2 bg-primary text-on-primary text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary-active transition-colors mb-8"
+            >
+              <Download size={15} /> PDF
+            </a>
             <p className="text-xs font-medium tracking-widest uppercase text-muted mb-4">Contents</p>
             <ul className="space-y-2 text-sm">
               <li>
@@ -72,7 +88,13 @@ export default function Paper() {
         </nav>
 
         <div className="min-w-0 max-w-3xl">
-          <aside id="summary" className="bg-surface-card rounded-2xl p-6 md:p-8 mb-16 scroll-mt-24">
+          <a
+            href={`${BASE_PATH}/${PAPER_PDF}`}
+            className="lg:hidden no-print inline-flex items-center gap-2 bg-primary text-on-primary text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary-active transition-colors mb-8"
+          >
+            <Download size={15} /> Download PDF
+          </a>
+          <aside id="summary" className="no-print bg-surface-card rounded-2xl p-6 md:p-8 mb-16 scroll-mt-24">
             <p className="text-xs font-medium tracking-widest uppercase text-accent-steel mb-4">Executive summary</p>
             <div className="prose-paper text-sm">
               <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
