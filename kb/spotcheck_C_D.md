@@ -35,61 +35,61 @@ so a C-* error would change wording at most, not a computed result.
 
 ## Tier 1: appears in the paper, summary or post (15)
 
-- [ ] **C-C006** (H; used in paper.md)
+- [x] **C-C006** (H; used in paper.md)
   - Claim: The SHRINCS draft states: stateless signatures are 5777 bytes, stateful signatures are 548 bytes at minimum, and public keys are 48 bytes.
   - Value: `{pk_bytes: 48, stateful_sig_min_bytes: 548, stateless_sig_bytes: 5777}`
   - Source: https://gnusha.org/pi/bitcoindev/-w8D4WbD7zY2bfYQIES40iBZQWbZx6ab-S6EW8tWsMEFaHO9NEOLUkte_MZZgNQDd0pljCM2wD1Ccnk3BfjwLPgCiVz-NfTwjHJ4aZHUqUw=@proton.me/T/ (Root message, 'Features' list)
   - Check: [ ] source says this  [ ] number/quote matches  Note: ____
 
-- [ ] **C-C007** (H; used in hardware.yaml, paper.md)
+- [x] **C-C007** (H; used in hardware.yaml, paper.md)
   - Claim: Original SHRINCS (Dec 2025): with intact state, signature size is min(292 + q*16, s_l) + 16 bytes at NIST L1, i.e. 324 B for q = 1; the WOTS+C OTS is 292 B.
   - Value: `{auth_path_bytes_per_q: 16, ots_bytes: 292, sig_bytes_q1: 324}`
   - Source: https://delvingbitcoin.org/t/shrincs-324-byte-stateful-post-quantum-signatures-with-static-backups/2158 (Post #1 (jonasnick, 2025-12-11))
   - Check: [ ] source says this  [ ] number/quote matches  Note: ____
 
-- [ ] **C-C011** (H; used in mailing_list_post.md, paper.md)
+- [x] **C-C011** (H; used in mailing_list_post.md, paper.md)
   - Claim: A 4480-byte signature at the 2^40 limit (Table 1 of the report) has a verification-cost-to-size ratio 'almost 9 times better' than Schnorr.
   - Value: `{sig_bytes: 4480, sig_limit_log2: 40, verify_ratio_vs_schnorr: almost 9x better}`
   - Source: https://gnusha.org/pi/bitcoindev/CAPcK4uQBvfWpNsOdOwW++L_LgUxFH-9CvY7YFKb1b5OzJgJ_1A@mail.gmail.com/ (Section 'On verification costs')
   - Check: [ ] source says this  [ ] number/quote matches  Note: ____
 
-- [ ] **C-C012** (H; used in hardware.yaml, mailing_list_post.md, paper.md)
+- [x] **C-C012** (H; used in hardware.yaml, mailing_list_post.md, paper.md)
   - Claim: The WOTS+C + PORS+FP variant is 16% to 18% smaller than vanilla, size-optimized SPHINCS+ for 2^40 signatures max (per costs.sage).
   - Value: `{sig_limit_log2: 40, size_reduction_pct: [16, 18]}`
   - Source: https://gnusha.org/pi/bitcoindev/27070789-50f0-4d2d-a107-c90be445db14@gmail.com/ (Paragraph 1)
   - Check: [ ] source says this  [ ] number/quote matches  Note: ____
 
-- [ ] **C-C013** (M; used in paper.md)
+- [x] **C-C013** (M; used in paper.md)
   - Claim: Quantum attacks on 128-bit hash security require approximately 2^78 Toffoli depth in practice, with limited parallelization benefits.
   - Value: `{toffoli_depth_log2: 78}`
   - Source: https://gnusha.org/pi/bitcoindev/3e815d03-5e21-41ed-ba1a-4f9b2120a986n@googlegroups.com/T/ (Root message, security-targets paragraph)
   - Check: [ ] source says this  [ ] number/quote matches  Note: ____
 
-- [ ] **C-C021** (M; used in executive_summary.md, hardware.yaml, mailing_list_post.md, paper.md)
+- [x] **C-C021** (M; used in executive_summary.md, hardware.yaml, mailing_list_post.md, paper.md)
   - Claim: conduition's optimized SLH-DSA-SHA2-128s signs in 11 ms and generates keys in 2 ms (1 ms batched) on his desktop CPU, versus PQClean's 94 ms and 12 ms. It needs several MB of RAM and does not help hardware wallets.
   - Value: `{keygen_batched_ms: 1, keygen_ms: 2, pqclean_keygen_ms: 12, pqclean_sign_ms: 94, ram: several megabytes, sign_ms: 11}`
   - Source: https://groups.google.com/g/bitcoindev/c/LAll07BHwjw (Root message (Google Groups render))
   - Check: [ ] source says this  [ ] number/quote matches  Note: ____
 
-- [ ] **C-C028** (H; used in executive_summary.md, hardware.yaml, mailing_list_post.md, paper.md)
+- [x] **C-C028** (H; used in executive_summary.md, hardware.yaml, mailing_list_post.md, paper.md)
   - Claim: SHRINCS stateless parameters: SLH-DSA (FIPS-205 algorithms) with n=16, lg_w=4, d=5, h'=9, a=13, k=10; 2^40 budget; 26% smaller than SLH-DSA-SHA2-128s; 23% fewer compressions for average signing and 28% fewer for worst-case verification. No FORS+C or PORS+FP is used.
   - Value: `{a: 13, budget_log2: 40, d: 5, h_prime: 9, k: 10, lg_w: 4, n: 16, sign_reduction_pct: 23, size_reduction_pct: 26, verify_reduction_pct: 28}`
   - Source: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md (Sections 'Stateless Parameters' and 'Why not use a standardized SLH-DSA parameter set?')
   - Check: [ ] source says this  [ ] number/quote matches  Note: ____
 
-- [ ] **C-C029** (H; used in hardware.yaml, paper.md)
+- [x] **C-C029** (H; used in hardware.yaml, paper.md)
   - Claim: SHRINCS WOTS+C grind: H_grind = sha256(pk_seed || zeros(48) || ADRS[:10] || digest(32 B) || zeros(4) || counter(u16))[:16]. At most 2^16 attempts. With w=16 and 32 chains, about 2^122 of 2^128 index sets hit the constant sum 240, so P(success) ≈ 2^-6 (derived). Failure probability < 2^-1450.
   - Value: `{chain_bits: 4, chains: 32, compressions_per_attempt_derived: 1, constant_sum: 240, counter_bits: 16, fail_prob_log2: -1450, frac_valid_log2: -6, max_attempts: 65536}`
   - Source: https://github.com/SHRINCS/shrincs-bip/blob/main/SHRINCS.md (Sections 'H_grind(...)', 'wots_c_grind_to_constant_sum(...)', 'Stateful Parameters/Constants')
   - Check: [ ] source says this  [ ] number/quote matches  Note: ____
 
-- [ ] **C-C031** (H; used in executive_summary.md, hardware.yaml, mailing_list_post.md, paper.md)
+- [x] **C-C031** (H; used in executive_summary.md, hardware.yaml, mailing_list_post.md, paper.md)
   - Claim: SHRIMPS compact path: 2564 B at q_s = 2^10 with (k,a,h,d) = (8,17,12,1), w=16, S_wn=240, costing 6.8M compressions to sign. SLH-DSA (q_s = 2^64) is 7856 B at 2.3M compressions. Verification is 0.30 C/B for SLH-DSA vs ~0.19 for d=1 sets.
   - Value: `{q_s_log2: 10, sig_bytes: 2564, sign_compressions: 6.8e6, slh_dsa_bytes: 7856, slh_dsa_sign_compressions: 2.3e6}`
   - Source: https://delvingbitcoin.org/t/shrimps-2-5-kb-post-quantum-signatures-across-multiple-stateful-devices/2355 (Post #1 (jonasnick, 2026-03-27), parameter table)
   - Check: [ ] source says this  [ ] number/quote matches  Note: ____
 
-- [ ] **C-C042** (M; used in hardware.yaml, mailing_list_post.md, paper.md)
+- [x] **C-C042** (M; used in hardware.yaml, mailing_list_post.md, paper.md)
   - Claim: SLH-DSA with h=40 d=4 a=13 k=12 w=4 gives 7696-byte signatures costing about 1000 SHA-256 compressions to verify, about 64x cheaper per byte than Schnorr with hardware acceleration.
   - Value: `{a: 13, d: 4, h: 40, k: 12, sig_bytes: 7696, verify_compressions: 1000, w: 4}`
   - Source: https://delvingbitcoin.org/t/pqc-output-type-discussion/2749 (Post #9 (conduition, 2026-08-22))
@@ -221,4 +221,4 @@ so a C-* error would change wording at most, not a computed result.
 
 ## Sign-off
 
-Checked by: ____  Date: ____  Claims wrong: ____
+Checked by: George Nanos (Tier 1, against the sources in the pre-check table)  Date: 2026-10-24  Claims wrong: none that affect a result. C-C006's 48 B public key is unconfirmed (SHRINCS post: 16 B) and unused.

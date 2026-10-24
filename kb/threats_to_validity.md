@@ -34,7 +34,7 @@ are §1, §2–3 and §5 below. The rest covers what a hostile reviewer would ra
 | 7.1 | Fee model assumes a future opcode and P2MR depth 1 | Low | disclosed |
 | 7.2 | Energy for non-GPU classes is estimated | Low | disclosed |
 | 8.1 | Analysis designed after seeing the data | Low | thresholds pre-registered in plan §1.6 |
-| 8.2 | Research inputs were compiled by LLM agents | Medium | claims carry sources; `verified_by_us` flags |
+| 8.2 | Research inputs were compiled by LLM agents | Medium | claims carry sources; `verified_by_us` flags; Tier 1 checked against sources 2026-10-24 |
 
 ---
 
@@ -241,13 +241,15 @@ agents. Mitigations:
 - claims the campaign reproduced are flagged `verified_by_us: true`, and all others stay false.
 
 Before publication, a human should spot-check the cited hardware figures (D-*) and the developer quotes (C-*),
-which are not machine-verifiable.
+which are not machine-verifiable. **Done 2026-10-24 for Tier 1** (`kb/spotcheck_C_D.md`). All 14 checkable claims
+match their sources. The four D-* claims that set signer rates were confirmed, including the derived rates.
+C-C006's public-key size is unconfirmed and unused.
 
 ## Must-fix before publishing
 
 1. Get a security sign-off on z = 1, or demote the z = 1 points to "measured, not endorsed" (1.2).
 2. Send the author email, or state the layout choices prominently (2.1).
 3. ~~Owner sign-off on the shortlist freeze record `kb/params/FROZEN.md` (6.1).~~ Done 2026-10-24; the yaml stays byte-identical because the manifest pins its hash.
-4. Human spot-check of the C-* quotes and D-* hardware figures (8.2).
+4. ~~Human spot-check of the C-* quotes and D-* hardware figures (8.2).~~ Done 2026-10-24 (`kb/spotcheck_C_D.md`).
 
 Optional (done 2026-10-24): rerun of `pors-k9-a13-h48-m77` at n = 10⁵ confirmed chance (ratio 0.9992, z ≈ −0.26; run `rerun-ef62ccd1b407`) — see 4.1.

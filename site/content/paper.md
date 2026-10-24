@@ -297,6 +297,9 @@ Summarized from `kb/threats_to_validity.md`:
 - **Tail extrapolation.** The 2⁻³⁰ tail is extrapolated from the geometric form.
 - **Hardware.** One laptop, one run.
 - **Shortlist cap.** The cap makes GPU savings a lower bound.
+- **Research inputs.** Literature quotes and cited hardware rates were compiled with LLM assistance. Every
+  claim carries its source (`kb/claims/all_claims.yaml`), and the claims behind cited signer rates were
+  checked by hand against their sources.
 
 ## 8. Conclusion and artifacts
 

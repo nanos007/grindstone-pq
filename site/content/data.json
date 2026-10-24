@@ -1703,7 +1703,7 @@
    "id": "8.2",
    "threat": "Research inputs were compiled by LLM agents",
    "severity": "Medium",
-   "status": "claims carry sources; `verified_by_us` flags"
+   "status": "claims carry sources; `verified_by_us` flags; Tier 1 checked against sources 2026-10-24"
   }
  ],
  "fees": [
