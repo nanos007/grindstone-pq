@@ -3,6 +3,9 @@
 **Measured grinding costs of Bitcoin-tuned hash-based signatures (WOTS+C, FORS+C, PORS+FP) on a consumer
 GPU and a laptop CPU.**
 
+**Website:** https://grindstone-pq.vercel.app · **Paper (PDF):** [`paper/grindstone-paper.pdf`](paper/grindstone-paper.pdf) ·
+**Dataset:** GitHub release `data-196e7e91e907`
+
 Hash-based post-quantum signatures for Bitcoin can be made smaller by *grinding*: the signer retries a
 hash until it meets a condition, which removes checksum chains or whole FORS trees from the signature.
 Published analyses give the expected cost of this search. GRINDSTONE measures the full distribution,
