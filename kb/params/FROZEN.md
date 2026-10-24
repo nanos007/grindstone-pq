@@ -10,4 +10,4 @@ hash:
 Editing the file, even its header, breaks that link. Treat this record as the freeze. Any change to the
 parameter set goes into a new file and a new campaign run.
 
-Owner sign-off: [ ] pending (threats_to_validity.md, "Must-fix" item 3).
+Owner sign-off: [x] George Nanos, 2026-10-24. Verified sha256 of shortlist_draft.yaml matches the manifest.

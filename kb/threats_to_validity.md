@@ -202,7 +202,7 @@ signing at ≤ 2³⁰ compressions so the campaign fits a night.
 - The byte savings for heavy signers (H2, RQ4) are therefore a lower bound. Hardware-wallet conclusions are
   not affected by the cap.
 - The shortlist header still says DRAFT; the freeze is recorded in `kb/params/FROZEN.md` (hash-pinned by
-  the run manifest) and awaits owner sign-off.
+  the run manifest) and was signed off by the owner on 2026-10-24.
 
 **6.2 Profile labels are ours (Low).** "hw_wallet_safe" (every grind ≤ 2¹² tries), "gpu_signer_moderate" and
 "gpu_signer_max" are our definitions. The community positions differ:
@@ -247,7 +247,7 @@ which are not machine-verifiable.
 
 1. Get a security sign-off on z = 1, or demote the z = 1 points to "measured, not endorsed" (1.2).
 2. Send the author email, or state the layout choices prominently (2.1).
-3. Owner sign-off on the shortlist freeze record `kb/params/FROZEN.md` (6.1); the yaml itself stays byte-identical because the manifest pins its hash.
+3. ~~Owner sign-off on the shortlist freeze record `kb/params/FROZEN.md` (6.1).~~ Done 2026-10-24; the yaml stays byte-identical because the manifest pins its hash.
 4. Human spot-check of the C-* quotes and D-* hardware figures (8.2).
 
 Optional (done 2026-10-24): rerun of `pors-k9-a13-h48-m77` at n = 10⁵ confirmed chance (ratio 0.9992, z ≈ −0.26; run `rerun-ef62ccd1b407`) — see 4.1.
