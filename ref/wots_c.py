@@ -34,15 +34,29 @@ class WotsParams:
         return self.w.bit_length() - 1
 
 
-def success_prob(p: WotsParams):
-    """ν / w^len1 · 2^-z_bits, ν = Σ_j (−1)^j C(len1, j) C(S + len1 − j·w − 1, len1 − 1)."""
+def _nu(w, l, S):
+    """Number of l-digit base-w vectors summing to S: Σ_j (−1)^j C(l, j) C(S + l − j·w − 1, l − 1)."""
     nu = 0
-    for j in range(p.len1 + 1):
-        top = p.S + p.len1 - j * p.w - 1
-        if top < p.len1 - 1:
+    for j in range(l + 1):
+        top = S + l - j * w - 1
+        if top < l - 1:
             break
-        nu += (-1) ** j * comb(p.len1, j) * comb(top, p.len1 - 1)
-    return Fraction(nu, p.w ** p.len1) / (1 << p.z_bits)
+        nu += (-1) ** j * comb(l, j) * comb(top, l - 1)
+    return nu
+
+
+def success_prob(p: WotsParams):
+    """ν(len1 − z, S) / w^len1 · 2^-min(z_bits, unused).
+
+    The trailing z_bits first cover the unused bits of d past the len1 digits (z_b, independent of the
+    sum), then whole trailing digits (z zero chains, which leave len1 − z digits to sum to S).
+    """
+    unused = 8 * sha2.N - p.len1 * p.logw
+    inside = max(0, p.z_bits - unused)
+    if inside % p.logw:
+        raise ValueError("z_bits must end on a digit boundary")
+    z = inside // p.logw
+    return Fraction(_nu(p.w, p.len1 - z, p.S), p.w ** p.len1) / (1 << min(p.z_bits, unused))
 
 
 def digits(d, logw, count):

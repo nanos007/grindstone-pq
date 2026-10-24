@@ -91,4 +91,5 @@ paper §7 and the executive summary, and add one sentence so readers can see why
 bits, independent of the digit sum) but wrong for z zero chains, where the zeroed digit is part of the sum
 (correct: ν(len1 − z, S, w)/w^len1, as in `costs.py:wots_c_success_prob`). It is only called with
 z_bits = 0 (tests). The campaign's analytic values come from `costs.py`, and the z = 1 configs match them.
-Fix or document it before anyone calls it with z_bits = z·lg w.
+**Fixed 2026-10-24.** The trailing z_bits now cover unused bits first (z_b), then whole digits (z). A test
+checks the result against `costs.py` for z = 1, 2.

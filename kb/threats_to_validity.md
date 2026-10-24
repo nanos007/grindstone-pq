@@ -13,7 +13,7 @@ are §1, §2–3 and §5 below. The rest covers what a hostile reviewer would ra
 | # | Threat | Severity | Status |
 |---|---|---|---|
 | 1.1 | Grinding time leaks information about SK.prf (R-grind) | Low | disclosed; standard PRF argument |
-| 1.2 | z = 1 (forced zero chain) at the GPU-signer points has no analysed security impact in our model | Medium | **open**; disclosed |
+| 1.2 | z = 1 (forced zero chain) at the GPU-signer points has no analysed security impact in our model | Medium | **open**; disclosed; argument prepared (`z1_security_note.md`), awaiting review |
 | 1.3 | Counter exhaustion makes signing fail | Low | mitigated (4-byte counter) |
 | 2.1 | Our byte layouts are our own choices, not an author spec | Medium | disclosed; email to authors drafted, unsent |
 | 2.2 | Cost model mis-prices FTS attempts (4 vs 6/3/7 compressions) | Medium | measured and reported (H1b) |
@@ -62,6 +62,11 @@ layer. Sources:
 **Impact on conclusions:** the largest byte savings we report (H2, RQ4) rely partly on z = 1. The z = 0
 `gpu_signer` alternatives are larger. Before the paper claims these sets as recommendations, the z = 1 security
 argument needs a cryptographer's sign-off. Until then the paper must label them "measured, not endorsed".
+
+SPHINCS+C's theorems (ePrint 2022/778, Thms B.2/C.2/D.1/5.2) are stated for general z, and no bound term
+depends on z (Lemma E.4). What remains is independent review and one verifier rule: the omitted digit must
+be bound, either by an explicit zero check or by summing over all len1 digits. Otherwise the scheme loses
+8 bits. Details: `kb/z1_security_note.md`. The question is also put to the authors (email draft, Q8).
 
 **1.3 Counter exhaustion (Low).** We use a 4-byte counter, and the per-instance probability of exhausting it is
 negligible: (1 − p)^(2³²) < e^(−340) even for the hardest grind (E[tries] = 1.26·10⁷).

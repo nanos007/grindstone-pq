@@ -14,6 +14,7 @@ I'm preparing GRINDSTONE, an open measurement of grinding-cost distributions (me
 5. **R-grinding counter.** Where does the counter go in PRF_msg(SK.prf, opt, m, counter)? [HMAC message = opt_rand ‖ M ‖ ctr4_BE.]
 6. **PORS+FP with SHA-256 only.** Is a 512-bit H_msg via two MGF1-SHA-256 blocks acceptable? Is τ (the first h bits, Alg. 1) split as idx_tree = τ >> h′? Should the probability of getting fewer than k distinct indices (about 0.1–1.3% for your rows by my count) be in the expected-work figures? [Yes, yes, we will include it.]
 7. **Minor.** The zero-chain range in §5, [w−1−z+1, w−1]: did you mean the last z digits, [len1−z+1, len1]? (SPHINCS+C uses the first z.)
+8. **z = 1 security.** Our smallest GPU-signer sets use z = 1 at w = 256 (S = 1912, 15 chains). We read SPHINCS+C (2022/778) Thms B.2/C.2/D.1/5.2 as covering general z with no z-dependent term (Lemma E.4). Is that right? And must a verifier bind the omitted digit, by checking it is zero or by summing all len1 digits? A verifier that sums only the ℓ kept chains would seem to lose z·lg w bits. [We label z = 1 "measured, not endorsed" until we hear from you.]
 
 I'll share the data and code before anything goes public. Thank you for the paper and the scripts; they made this study possible.
 

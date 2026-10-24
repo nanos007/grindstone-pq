@@ -141,7 +141,7 @@ p (nothing fitted), tested with KS (Holm-corrected) and Anderson–Darling. Σz�
 | | value |
 |---|---|
 | configs / samples | 37 / 11.16 M, all reference-verified |
-| max \|mean/analytic − 1\| | 1.66 % (`pors-k9-a13-h48-m77`, n = 2·10⁴, z = −2.36) |
+| max \|mean/analytic − 1\| | 1.66 % (`pors-k9-a13-h48-m77`, n = 2·10⁴, z = −2.36); rerun at n = 10⁵: 0.08 %, z ≈ −0.26 |
 | Σz² (37 dof) | 39.6, p = 0.36; 2 configs outside their 95 % CI (1.9 expected) |
 | KS on PIT, Holm 5 % | 0 rejections |
 | AD on PIT, 5 % | 2 rejections (1.9 expected) |
@@ -253,8 +253,16 @@ profiles rather than a menu.
 counter anyway, ctr-grind halves FORS+C grinding.
 
 **Overgrinding (OQ-3).** Raising the WOTS+C target S trades signer work for verifier work at fixed size. At
-w = 4, S = 96 → 128 removes a third of per-layer chain steps for about 650× more grinding (analytic).
-**[TODO: measured sweep, `--extra oq3`, notebook 05.]**
+w = 4, S = 96 → 128 removes a third of per-layer chain steps for about 650× more grinding. Measured
+(run `oq3-eb65c6cd81a0`, 21 configs, 10⁵–10⁶ samples each, notebook 05): every mean is within 0.26 % of
+analytic.
+- **w = 4.** S = 128 costs 1.5·10⁴ tries/layer, a p99 of 1.7 s on a software-SHA Cortex-M4. S = 140
+  (−46 % chain steps) costs 6.2·10⁶ tries, a p99 of 12 min on that MCU but 0.12 s on a 12-thread laptop CPU.
+- **w = 16.** S = 240 → 304 removes 27 % of chain steps for 20× more tries, raising the MCU p99 from
+  7.5 ms to 0.15 s.
+
+Overgrinding is cheap when the signer is a PC. For a software-SHA hardware wallet at w = 4, the p99 passes
+1 s once about a third of the chain steps are removed (S ≥ 128).
 
 ## 6. Related work
 
@@ -269,14 +277,17 @@ w = 4, S = 96 → 128 removes a third of per-layer chain steps for about 650× m
 
 Summarized from `kb/threats_to_validity.md`:
 - **z = 1 security (open).** The z = 1 (forced zero chain) gpu_signer points have no analysed security impact
-  in our model. They are reported as measured, not endorsed.
+  in our model. They are reported as measured, not endorsed. SPHINCS+C's theorems are stated for general z
+  with no z-dependent bound term. What remains is independent review and the verifier rule that the zeroed
+  digit must be checked (threats §1.2).
 - **Our byte layouts.** Tries transfer to any author layout; per-attempt cost is reported for both readings
   of H_msg.
 - **Modelled tree-building cost.** The base cost is modelled, not measured.
 - **Cited ladder.** Four of six signer classes use cited rates; tries remain the primary, hardware-independent
   metric.
 - **Parallelism assumption.** Throughput is assumed to equal latency within a class.
-- **Small n.** Three configs have n = 2·10⁴.
+- **Small n.** Three configs have n = 2·10⁴. The one with the largest deviation was rerun at 10⁵ and matches
+  the analytic mean (ratio 0.9992).
 - **Tail extrapolation.** The 2⁻³⁰ tail is extrapolated from the geometric form.
 - **Hardware.** One laptop, one run.
 - **Shortlist cap.** The cap makes GPU savings a lower bound.
@@ -300,4 +311,5 @@ runner, notebooks, `python -m runner.reproduce`. Data under CC-BY-4.0, dataset S
 [BIP360] BIP-360 (P2MR), bitcoin/bips, merged 2026-02-11.
 [SHRINCS] SHRINCS BIP draft, github.com/SHRINCS/shrincs-bip, commit 2d1679b.
 [REPO] BlockstreamResearch/SPHINCS-Parameters, commit ceee8ed.
-[AK] M. Abri, J. Katz. PORS+FP tooling, github.com/MehdiAbri/PORS-FP. **[TODO: paper citation]**
+[AK] M. Abri, J. Katz. Shorter Hash-Based Signatures Using Forced Pruning. IACR ePrint 2025/2069.
+Tooling: github.com/MehdiAbri/PORS-FP.

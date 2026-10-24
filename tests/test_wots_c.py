@@ -26,6 +26,13 @@ def test_probabilities_sum_to_one():
     assert total == 1
 
 
+@pytest.mark.parametrize("w,len1,S,z", [(256, 16, 1912, 1), (16, 32, 240, 1), (16, 32, 232, 2)])
+def test_zero_chain_prob_matches_costs(w, len1, S, z):
+    from ref import costs
+    p = wots_c.WotsParams(w=w, len1=len1, S=S, z_bits=z * (w.bit_length() - 1))
+    assert wots_c.success_prob(p) == costs.wots_c_success_prob(w, len1, S, z)
+
+
 def test_digits_msb_first():
     assert wots_c.digits(bytes([0xAB, 0xCD]), 4, 4) == [0xA, 0xB, 0xC, 0xD]
     assert wots_c.digits(bytes([0b11100100]), 2, 4) == [3, 2, 1, 0]  # w = 4 (OQ-3 sweep)

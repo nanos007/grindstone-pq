@@ -27,7 +27,8 @@ two named parameter profiles ("hardware-wallet-safe" and "heavy signer") rather 
 
 **Caveats.**
 - The smallest "heavy signer" sets force one WOTS chain to zero (z = 1); their security needs a
-  cryptographer's sign-off before anyone recommends them.
+  cryptographer's sign-off before anyone recommends them. The SPHINCS+C proofs are stated for general z,
+  so the open point is narrow: independent review, plus a verifier that checks the zeroed chain.
 - Hardware-wallet timings use published chip speeds, not our own measurements.
 
 **Artifacts.** Open-source GPU grinder, dataset (CC-BY-4.0) and one-command reproduction:
