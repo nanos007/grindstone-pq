@@ -8,6 +8,31 @@ executive summary, mailing-list post and `kb/hardware.yaml`, so a few matches ma
 For each claim: open the source, find the location, and confirm that the statement and the value match.
 Mark a wrong claim ✗, fix it in `all_claims.yaml`, and tell Claude which downstream number to recompute.
 
+## Pre-check of Tier 1 (Claude, 2026-10-24; sources fetched, not a substitute for the sign-off below)
+
+All 14 checkable Tier-1 claims match their sources. C-C006's public-key size (48 B) was not found; the original
+SHRINCS post says 16 B. No downstream number uses it. Re-checking usage showed that only the four D-* claims
+feed results (signer rates in `kb/hardware.yaml`). The C-* matches were coincidental numbers (16, 40, 548, ...),
+so a C-* error would change wording at most, not a computed result.
+
+| Claim | Says | Source says | Verdict |
+|---|---|---|---|
+| C-C006 | SHRINCS: 5777 B stateless, 548 B stateful min, 48 B pk | SHRINCS.md: `SHRINCS_SL_SIGNATURE_SIZE` 5777, `SHRINCS_SF_SIGNATURE_SIZE_MIN` 548; pk 48 B not found (Dec 2025 post: "public key is 16 bytes") | 2/3 ✓, pk ?; not used |
+| C-C007 | OTS 292 B, min(292+q·16, s_l)+16 | "OTS signature is 292 bytes … min(292 + q·16, s_l) + 16" (jonasnick, 2025-12-11) | ✓ |
+| C-C011 | 4480 B at 2⁴⁰, verify ratio "almost 9 times better" | "4480 bytes signatures (under the 2^40 signatures limit) … ratio being almost 9 times better" (Kudinov, bitcoindev 2025-12-08) | ✓ |
+| C-C012 | WOTS+C+PORS+FP 16–18 % smaller at 2⁴⁰ | "16% to 18% smaller than vanilla, size-optimized SPHINCS+ (for 2^40 signatures max)" (same thread; author per Google Groups render: Kudinov) | ✓ (author: check) |
+| C-C013 | ~2⁷⁸ Toffoli depth, limited parallelism | "approximately 2^78 Toffoli depth operations in practice, with limited parallelization benefits" (Kudinov, 2025-12-08) | ✓ |
+| C-C021 | 11 ms sign, 2 ms keygen (1 ms batched); PQClean 94/12 ms; MB of RAM | verbatim (conduition, bitcoindev 2025-11-24) | ✓ |
+| C-C028 | SHRINCS stateless n16 lg_w4 d5 h'9 a13 k10, 2⁴⁰, −26 %/−23 %/−28 % | SHRINCS.md parameter table + rationale, all values | ✓ |
+| C-C029 | H_grind layout, u16 counter, 2¹⁶ tries, 2¹²² of 2¹²⁸, fail < 2⁻¹⁴⁵⁰ | SHRINCS.md `H_grind` code and grind docs, all values | ✓ |
+| C-C031 | SHRIMPS 2564 B @ 2¹⁰, (8,17,12,1), 6.8M; SLH-DSA 7856 B @ 2.3M; 0.30 vs ~0.19 C/B | SHRIMPS post table and text, all values | ✓ |
+| C-C042 | h40 d4 a13 k12 w4 → 7696 B, ~1000 compressions, ~64× cheaper/byte | conduition, Delving #2749, all values | ✓ |
+| C-C043 | 338,000 comp/s, ~482 sig/s, ~20 s per 10k-sig block | conduition, Delving #2875, all values | ✓ |
+| D-C004 | pqm4 cycles at 24 MHz (no wait states) | "obtained at 24MHz to avoid wait cycles due to the speed of the memory controller" | ✓ (wording: memory, not flash) |
+| D-C009 | STM32L4A6Z sw SHA-256 847.458 KiB/s @ 80 MHz | "SHA-256 … 847.458 KiB/s", "Cortex-M4 at 80 MHz"; derived 13.6k comp/s, 92.2 c/B recomputed ✓ | ✓ |
+| D-C023 | Pi 5 SHA-256 wolfCrypt 1464, MbedTLS 205 MiB/s | "SHA-256 1464 MiB/s 205 MiB/s" (Cortex-A76 @ 2.4 GHz); derived 24.0M comp/s ✓ | ✓ |
+| D-C029 | SHA-NI 64-B block ≈ 80 ns (Xeon Gold 5318Y) | "On SHA-NI hardware, one 64-byte SHA-256 block compresses in roughly 80 ns" | ✓ (claim says "one-shot API"; source derives it from the incremental-API floor) |
+
 ## Tier 1: appears in the paper, summary or post (15)
 
 - [ ] **C-C006** (H; used in paper.md)
