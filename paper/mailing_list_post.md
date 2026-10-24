@@ -1,6 +1,6 @@
 # bitcoindev / Delving Bitcoin post (DRAFT, not sent)
 
-Fill in `[repo link]` before sending. Do not post before the Kudinov/Nick email has been answered or
+Do not post before the Kudinov/Nick email has been answered or
 deliberately skipped (threats §2.1), and before the z = 1 caveat is settled (threats §1.2).
 
 ```
@@ -17,5 +17,5 @@ Subject: Empirical grinding tails for WOTS+C/FORS+C/PORS+FP at 2^20-2^40 sig lim
 4/ Frontier: a heavy-signer set is 596-1,052 B (149-263 vB per input, 17-23% of a 1-in/2-out spend) smaller
    than a hw-wallet-safe one; verification gets cheaper, never dearer. That is the "relative performance"
    gmaxwell said the one-vs-two-parameter-sets question depends on. (Smallest sets use z=1; caveats in repo.)
-5/ Repo, parquet, `python -m runner.reproduce`: [repo link]. Happy to rerun any (h,d,a,k,w,S,z) you want.
+5/ Repo, parquet, `python -m runner.reproduce`: https://github.com/nanos007/grindstone-pq. Happy to rerun any (h,d,a,k,w,S,z) you want.
 ```

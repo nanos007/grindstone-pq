@@ -298,7 +298,7 @@ Grinding behaves exactly as modelled in tries, costs more per attempt than model
 minor part of signing. The signer's hardware budget is a first-order size lever: hundreds of bytes per input.
 The PQ-signature BIP should state its signer assumption explicitly and consider two named parameter profiles.
 
-**Artifacts.** `github.com/[TODO]/grindstone`: NVRTC kernels, SHA-NI grinder, Python reference, campaign
+**Artifacts.** `github.com/nanos007/grindstone-pq`: NVRTC kernels, SHA-NI grinder, Python reference, campaign
 runner, notebooks, `python -m runner.reproduce`. Data under CC-BY-4.0, dataset SHA-256
 `01e9fd2ca78f89e5c2525072705e8f32f42863054ffcbc7301341905bfe98d80`.
 

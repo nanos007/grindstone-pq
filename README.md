@@ -9,7 +9,7 @@ Published analyses give the expected cost of this search. GRINDSTONE measures th
 tails included, for the parameter sets of Kudinov–Nick (ePrint 2025/2203) and a set of smaller
 "heavy-signer" points. It maps the results onto signer hardware from hardware wallets to GPUs.
 
-- Plan and research questions: `../btc-pq-grinding-project.md`
+- Plan and research questions: `btc-pq-grinding-project.md` (kept outside this repository)
 - Results: [`analysis/README.md`](analysis/README.md) (headline numbers) and `analysis/*.ipynb`
 - Threats to validity: [`kb/threats_to_validity.md`](kb/threats_to_validity.md)
 - Paper draft: [`paper/`](paper/)
@@ -52,7 +52,7 @@ pip package.
 ```
 pip install -r env/requirements.txt
 python -m env.check_env          # compiles a test kernel, records GPU/CPU/OS in data/manifest.jsonl
-python -m pytest -q              # 109 tests; -k "not gpu" for the CPU-only subset
+python -m pytest -q              # 112 tests; -k "not gpu" for the CPU-only subset
 ```
 
 ## Running
@@ -88,6 +88,23 @@ grind and invalidates its timing data. Tries counts stay correct, but throughput
 Instance inputs derive from SHA-256("grindstone" ‖ run_id ‖ i), so every sample can be regenerated.
 
 Dataset SHA-256 (`runner.reproduce --hash`): `01e9fd2ca78f89e5c2525072705e8f32f42863054ffcbc7301341905bfe98d80`
+
+## Website
+
+`site/` is a static Next.js site: results, an interactive signer-budget explorer, method, the paper and
+reproduction steps, styled after nanos.work. It reads only `site/content/` (committed), so it builds
+without Python or the raw dataset.
+
+```
+python site/scripts/export_data.py    # refresh site/content/ after re-running the notebooks
+cd site && npm install
+npm run dev                           # http://localhost:3000
+npm run check                         # explorer rule vs. analysis/out/03_pareto (112 checks)
+npm run build                         # static export to site/out/
+```
+
+Vercel: import the repository with Root Directory `site`. GitHub Pages: build with
+`NEXT_PUBLIC_BASE_PATH=/grindstone-pq` and publish `site/out/`.
 
 ## License
 

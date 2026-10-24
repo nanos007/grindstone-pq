@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+/* Design tokens copied from nanos.work (C:\Projects\nanos_website\app\globals.css). */
+@theme {
+  /* Brand Colors */
+  --color-primary: #cc785c;
+  --color-primary-active: #a9583e;
+  --color-primary-disabled: #e6dfd8;
+
+  /* Text */
+  --color-ink: #141413;
+  --color-body: #3d3d3a;
+  --color-body-strong: #252523;
+  --color-muted: #6c6a64;
+  --color-muted-soft: #8e8b82;
+
+  /* Borders */
+  --color-hairline: #e6dfd8;
+  --color-hairline-soft: #ebe6df;
+
+  /* Surfaces */
+  --color-canvas: #faf9f5;
+  --color-surface-soft: #f5f0e8;
+  --color-surface-card: #efe9de;
+  --color-surface-cream-strong: #e8e0d2;
+  --color-surface-dark: #181715;
+  --color-surface-dark-elevated: #252320;
+  --color-surface-dark-soft: #1f1e1b;
+
+  /* On-color */
+  --color-on-primary: #ffffff;
+  --color-on-dark: #faf9f5;
+  --color-on-dark-soft: #a09d96;
+
+  /* Accents */
+  --color-accent-teal: #5db8a6;
+  --color-accent-amber: #e8a55a;
+  --color-accent-steel: #4682b4;
+
+  /* Semantic */
+  --color-success: #5db872;
+  --color-warning: #d4a017;
+  --color-error: #c64545;
+
+  /* Chart series (validated on canvas #faf9f5: chroma, CVD ΔE 17.0 protan, contrast >= 3:1).
+     Brand steel #4682b4 fails the chroma floor for marks, so charts use this step of the same hue. */
+  --color-series-1: #3b7fc4;
+  --color-series-2: #cc785c;
+  --color-grid: #e6dfd8;
+
+  /* Fonts */
+  --font-display: var(--font-cormorant), "Tiempos Headline", "EB Garamond", Georgia, serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #faf9f5;
+  color: #141413;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Long-form paper typography (react-markdown output). */
+.prose-paper {
+  color: var(--color-body);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+.prose-paper h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  color: var(--color-ink);
+  margin: 0 0 1rem;
+}
+.prose-paper h2 {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  letter-spacing: -0.5px;
+  color: var(--color-ink);
+  margin: 3rem 0 1rem;
+  scroll-margin-top: 5rem;
+}
+.prose-paper h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin: 2rem 0 0.75rem;
+  scroll-margin-top: 5rem;
+}
+.prose-paper p,
+.prose-paper ul,
+.prose-paper ol {
+  margin: 0 0 1rem;
+}
+.prose-paper ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.prose-paper ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.prose-paper li {
+  margin: 0.25rem 0;
+}
+.prose-paper strong {
+  color: var(--color-body-strong);
+  font-weight: 500;
+}
+.prose-paper a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-paper blockquote {
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface-soft);
+  padding: 0.75rem 1rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+}
+.prose-paper code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--color-surface-card);
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+}
+.prose-paper pre {
+  background: var(--color-surface-dark);
+  color: var(--color-on-dark);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  margin: 0 0 1.5rem;
+}
+.prose-paper pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+.prose-paper .table-wrap {
+  overflow-x: auto;
+  margin: 0 0 1.5rem;
+  border: 1px solid var(--color-hairline);
+  border-radius: 0.75rem;
+}
+.prose-paper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+.prose-paper th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--color-ink);
+  background: var(--color-surface-soft);
+}
+.prose-paper th,
+.prose-paper td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-hairline-soft);
+  white-space: nowrap;
+}
+.prose-paper tr:last-child td {
+  border-bottom: none;
+}
