@@ -109,6 +109,11 @@ npm run build                         # static export to site/out/
 Vercel: import the repository with Root Directory `site`. GitHub Pages: build with
 `NEXT_PUBLIC_BASE_PATH=/grindstone-pq` and publish `site/out/`.
 
+## Contact and support
+
+Georgios Nanos, georgios.nanos@rwth-aachen.de. GRINDSTONE is an independent hobby project. If it is useful to
+you, Bitcoin donations are welcome: `14SrrzdeaZ9WotWopNPnxL8z2BJCgds1pn`
+
 ## License
 
 Code: MIT (`LICENSE`). Data and figures: CC-BY-4.0.

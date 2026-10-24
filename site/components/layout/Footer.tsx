@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { REPO_URL } from "@/lib/site";
+import { Mail } from "lucide-react";
+import { BITCOIN_ADDRESS, CONTACT_EMAIL, REPO_URL } from "@/lib/site";
 
 const footerLinks = {
   Study: [
@@ -13,7 +14,7 @@ const footerLinks = {
     { label: "Reproduce", href: "/reproduce/" },
   ],
   Connect: [
-    { label: "nanos.work", href: "https://www.nanos.work", external: true },
+    { label: "Email", href: `mailto:${CONTACT_EMAIL}`, external: true },
     ...(REPO_URL ? [{ label: "Source code", href: REPO_URL, external: true }] : []),
   ],
 };
@@ -40,7 +41,7 @@ export default function Footer() {
                     {"external" in link && link.external ? (
                       <a
                         href={link.href}
-                        target="_blank"
+                        target={link.href.startsWith("http") ? "_blank" : undefined}
                         rel="noopener noreferrer"
                         className="text-sm text-on-dark-soft hover:text-on-dark transition-colors"
                       >
@@ -58,15 +59,19 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-8 border-t border-surface-dark-elevated">
+        <div className="pb-8 mb-8 border-b border-surface-dark-elevated">
+          <p className="text-xs font-medium tracking-widest uppercase text-on-dark mb-2">Support with Bitcoin</p>
+          <p className="font-mono text-xs text-on-dark-soft break-all select-all">{BITCOIN_ADDRESS}</p>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <p className="text-xs">© 2026 Georgios Nanos · Code MIT · Data and figures CC-BY-4.0</p>
           <a
-            href="https://www.nanos.work"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs hover:text-on-dark transition-colors"
+            href={`mailto:${CONTACT_EMAIL}`}
+            className="inline-flex items-center gap-1.5 text-xs hover:text-on-dark transition-colors"
+            aria-label={`Email ${CONTACT_EMAIL}`}
           >
-            www.nanos.work
+            <Mail size={13} aria-hidden /> {CONTACT_EMAIL}
           </a>
         </div>
       </div>

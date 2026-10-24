@@ -221,4 +221,4 @@ so a C-* error would change wording at most, not a computed result.
 
 ## Sign-off
 
-Checked by: George Nanos (Tier 1, against the sources in the pre-check table)  Date: 2026-10-24  Claims wrong: none that affect a result. C-C006's 48 B public key is unconfirmed (SHRINCS post: 16 B) and unused.
+Checked by: Georgios Nanos (Tier 1, against the sources in the pre-check table)  Date: 2026-10-24  Claims wrong: none that affect a result. C-C006's 48 B public key is unconfirmed (SHRINCS post: 16 B) and unused.

@@ -66,7 +66,7 @@ argument needs a cryptographer's sign-off. Until then the paper must label them 
 SPHINCS+C's theorems (ePrint 2022/778, Thms B.2/C.2/D.1/5.2) are stated for general z, and no bound term
 depends on z (Lemma E.4). What remains is independent review and one verifier rule: the omitted digit must
 be bound, either by an explicit zero check or by summing over all len1 digits. Otherwise the scheme loses
-8 bits. Details: `kb/z1_security_note.md`. The question is also put to the authors (email draft, Q8).
+8 bits. Details: `kb/z1_security_note.md`. The question is also put to the authors (email draft, Q5).
 
 **1.3 Counter exhaustion (Low).** We use a 4-byte counter, and the per-instance probability of exhausting it is
 negligible: (1 − p)^(2³²) < e^(−340) even for the hardest grind (E[tries] = 1.26·10⁷).

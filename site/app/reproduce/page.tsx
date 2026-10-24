@@ -29,7 +29,7 @@ python -m runner.run_campaign --extra oq3       # OQ-3 overgrinding sweep (~15 m
 python analysis/build_notebooks.py              # rebuild + execute all notebooks`;
 
 const bibtex = `@misc{nanos2026grindstone,
-  author = {Nanos, George},
+  author = {Nanos, Georgios},
   title  = {Grinding at the Edge: Empirical Signer-Cost Distributions
             for Bitcoin-Tuned Hash-Based Signatures},
   year   = {2026},

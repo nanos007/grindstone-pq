@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { DonateDropdown, MobileDonate } from "./Donate";
 
 const navItems = [
   { label: "Results", href: "/results/" },
@@ -66,6 +67,9 @@ export default function Navigation() {
               </Link>
             </li>
           ))}
+          <li>
+            <DonateDropdown />
+          </li>
         </ul>
 
         <button
@@ -95,6 +99,7 @@ export default function Navigation() {
               </li>
             ))}
           </ul>
+          <MobileDonate />
         </div>
       )}
     </header>

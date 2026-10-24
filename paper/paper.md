@@ -1,6 +1,6 @@
 # Grinding at the Edge: Empirical Signer-Cost Distributions for Bitcoin-Tuned Hash-Based Signatures
 
-*George Nanos* · DRAFT 2026-10-24 · under review; open items are listed in §7
+*Georgios Nanos* · DRAFT 2026-10-24 · under review; open items are listed in §7
 
 > **Draft status.** Every number in this draft comes from `analysis/out/` (run `196e7e91e907`) or from
 > `kb/claims/all_claims.yaml`.

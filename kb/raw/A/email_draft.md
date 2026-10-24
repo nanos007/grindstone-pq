@@ -1,22 +1,32 @@
 # Draft email to Kudinov & Nick (not sent; for owner review)
 
 **To:** Mikhail Kudinov, Jonas Nick
-**Subject:** Byte-level questions on WOTS+C / FORS+C / PORS+FP grinding (ePrint 2025/2203, SPHINCS-Parameters@ceee8ed)
+**Subject:** Measured grinding costs for your hash-based signature parameters (+ 5 short questions)
 
 Dear Mikhail, dear Jonas,
 
-I'm preparing GRINDSTONE, an open measurement of grinding-cost distributions (mean and tails, CPU and consumer GPU) for the WOTS+C, FORS+C and PORS+FP rows in your paper and repo. Everything uses SHA-256 only at n = 16. I'd like the kernels to match what you have in mind, so I have a few short questions. My current defaults are in brackets. A one-word answer to each would already help.
+I'm not a cryptographer, just an engineer who wanted to do something useful with his GPU for Bitcoin's
+quantum question. Your paper (ePrint 2025/2203) and the SPHINCS-Parameters scripts made that possible.
 
-1. **H_msg cost.** costs.sage sets `C_Hmsg = 2`, and §13.2 says a 256-bit digest gives two compression calls. With the FIPS 205 SHA2 construction, MGF1-SHA-256(R‖PK.seed‖SHA-256(R‖PK.seed‖PK.root‖M), m), I count 2 + 2 = 4 for M = 32 B. Adding PRF_msg (HMAC, 2 with cached ipad/opad) gives 6 per R-grinding attempt rather than 4. Did you intend a single-SHA-256 H_msg, or is 4 the right figure? [Default: FIPS 205, so 6 per attempt.]
-2. **|R|.** The paper sets the PRF_msg output to 256 bits, and Table 1/2 sizes include a 32-byte R. The repo switched to `randomness_size = 16` in 31e2cdb. Which should we treat as canonical? [16]
-3. **WOTS+C tweak and counter.** For Th(P, T*_adrs, m‖count): which ADRS type value should we use, and does the counter go after m (4 bytes, big-endian, starting at 0) or inside the ADRS as in the SPHINCS+C code? The SHRINCS draft uses type 22, a 16-bit counter and alignment padding. [Type 7, keypair = leaf, ADRSc‖m‖ctr4_BE.]
-4. **FORS+C zero bits.** Should we read "last a bits" as base_2b(md, a, k)[k−1] = 0, i.e. bits [(k−1)a, ka) of the FIPS 205 digest? The SPHINCS+C code instead checks a separate prefix field. [Yes, the last a-bit chunk of md.]
-5. **R-grinding counter.** Where does the counter go in PRF_msg(SK.prf, opt, m, counter)? [HMAC message = opt_rand ‖ M ‖ ctr4_BE.]
-6. **PORS+FP with SHA-256 only.** Is a 512-bit H_msg via two MGF1-SHA-256 blocks acceptable? Is τ (the first h bits, Alg. 1) split as idx_tree = τ >> h′? Should the probability of getting fewer than k distinct indices (about 0.1–1.3% for your rows by my count) be in the expected-work figures? [Yes, yes, we will include it.]
-7. **Minor.** The zero-chain range in §5, [w−1−z+1, w−1]: did you mean the last z digits, [len1−z+1, len1]? (SPHINCS+C uses the first z.)
-8. **z = 1 security.** Our smallest GPU-signer sets use z = 1 at w = 256 (S = 1912, 15 chains). We read SPHINCS+C (2022/778) Thms B.2/C.2/D.1/5.2 as covering general z with no z-dependent term (Lemma E.4). Is that right? And must a verifier bind the omitted digit, by checking it is zero or by summing all len1 digits? A verifier that sums only the ℓ kept chains would seem to lose z·lg w bits. [We label z = 1 "measured, not endorsed" until we hear from you.]
+I measured how long grinding actually takes for the WOTS+C, FORS+C and PORS+FP rows: 11.16 million grinds on a
+45 W laptop GPU, each checked against a reference implementation. Your analytic means hold to within 2 %, and
+the tails are geometric. Everything is public as a work in progress, with the draft paper (PDF), data and code:
+https://grindstone-pq.vercel.app
 
-I'll share the data and code before anything goes public. Thank you for the paper and the scripts; they made this study possible.
+If any of it is useful to you, I'd be glad. I had to choose some byte-level details myself, so I have five short
+questions. A one-word answer is plenty, and no reply is fine too:
+
+1. **H_msg cost.** With the FIPS 205 SHA-2 construction I count 6 compressions per R-grinding attempt, not 4 as in
+   costs.sage. Is 4 intended (a single-SHA-256 H_msg)?
+2. **|R|.** 16 bytes (repo) or 32 bytes (paper tables)?
+3. **WOTS+C counter.** Does the 4-byte big-endian counter go after m, and which ADRS type should be used?
+4. **FORS+C.** Is "last a bits are zero" the last a-bit chunk of md, i.e. base_2b(md, a, k)[k−1] = 0?
+5. **z = 1.** My smallest GPU-signer sets zero one chain at w = 256. I read the SPHINCS+C proofs as covering
+   general z, provided the verifier checks the zeroed chain. Is that right? Until I hear from you, those sets are
+   labelled "measured, not endorsed".
+
+I'll correct the draft based on your answers. Thank you for the paper and the scripts.
 
 Best regards,
-George Nanos
+Georgios Nanos
+georgios.nanos@rwth-aachen.de

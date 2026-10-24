@@ -61,7 +61,7 @@ def main():
         writer = PdfWriter(clone_from=PdfReader(raw))
         writer.add_metadata({
             "/Title": "Grinding at the Edge: Empirical Signer-Cost Distributions for Bitcoin-Tuned Hash-Based Signatures",
-            "/Author": "George Nanos",
+            "/Author": "Georgios Nanos",
             "/Subject": "GRINDSTONE: measured grinding costs of WOTS+C, FORS+C and PORS+FP (draft 2026-10-24)",
             "/Keywords": "post-quantum, Bitcoin, SPHINCS+, WOTS+C, FORS+C, PORS+FP, grinding, GPU",
         })
