@@ -21,7 +21,7 @@ are §1, §2–3 and §5 below. The rest covers what a hostile reviewer would ra
 | 2.4 | R = 16 B (repo, FIPS 205) vs 32 B (paper tables) | Low | disclosed; both sizes in shortlist |
 | 3.1 | GPU kernel bug produces "too good" numbers | Low | mitigated (E1 gate, full reference check, CPU match, means) |
 | 3.2 | Minimal-counter property only spot-checked | Low | mitigated by means; disclosed |
-| 4.1 | Three heavy PORS+FP configs have n = 2·10⁴ < 10⁵ | Low | disclosed; optional rerun |
+| 4.1 | Three heavy PORS+FP configs have n = 2·10⁴ < 10⁵ | Low | disclosed; largest-deviation config reran at 10⁵ → chance confirmed |
 | 4.2 | Multiple testing across 37 configs | Low | mitigated (Σz², Holm) |
 | 4.3 | The 2⁻³⁰ worst case cannot be observed | Medium | disclosed; tail form tested to ~10⁻⁴ |
 | 4.4 | Per-signature distributions are resampled, not measured end to end | Low | disclosed; independence holds by construction |
@@ -131,8 +131,9 @@ reference check covers acceptance.
 `pors-k7-a19-h32-m96` and `pors-k9-a13-h48-m77`, below the plan's 10⁵ target (DoD §1.6).
 - Their 95 % CIs are ±1.4 %, inside the 2 % DoD band.
 - `pors-k9-a13-h48-m77` is the largest deviation (−1.66 %, z = −2.36).
-- A rerun of that one config at 10⁵ (≈2.2 h GPU) would settle whether it is chance. It is optional, and the
-  command is in the project README.
+- That config was rerun at n = 10⁵ (run `rerun-ef62ccd1b407`, 2026-10-24, ≈2.1 h GPU, `verified_all = true`):
+  ratio = 0.9992 (−0.08 %, ±0.62 % CI95), i.e. z ≈ −0.26. The n = 2·10⁴ deviation was sampling noise; the
+  model holds. The other two heavy configs keep n = 2·10⁴ (CIs ±1.4 %, inside the 2 % DoD band).
 
 **4.2 Multiple testing (Low).** 37 configs × 3 tests. We report Σz² (p = 0.36), the count outside the 95 % CI
 (2 vs. 1.9 expected), Holm-adjusted KS (0 rejections) and AD at 5 % (2 vs. 1.9 expected). No config is
@@ -244,4 +245,4 @@ which are not machine-verifiable.
 3. Owner sign-off on the shortlist freeze record `kb/params/FROZEN.md` (6.1); the yaml itself stays byte-identical because the manifest pins its hash.
 4. Human spot-check of the C-* quotes and D-* hardware figures (8.2).
 
-Optional: rerun `pors-k9-a13-h48-m77` at n = 10⁵ (4.1).
+Optional (done 2026-10-24): rerun of `pors-k9-a13-h48-m77` at n = 10⁵ confirmed chance (ratio 0.9992, z ≈ −0.26; run `rerun-ef62ccd1b407`) — see 4.1.
