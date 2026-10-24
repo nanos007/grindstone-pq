@@ -4,6 +4,8 @@ baseline, with E6 power logging throughout (doc §4.3).
     python -m runner.run_campaign --smoke            # ~5 min end-to-end check, tiny sample counts
     python -m runner.run_campaign                    # full campaign
     python -m runner.run_campaign --resume <run_id>  # continue an interrupted run
+    python -m runner.run_campaign --extra oq3        # add-on config set (runner.configs.EXTRA)
+    python -m runner.run_campaign --only pors-k9-a13-h48-m77 --n 100000   # rerun configs at a new n
 
 Everything lands in data/raw/<run_id>/: one Parquet per config (append-only; a finished config is
 skipped on resume), summary.jsonl, gate.json, e0/e5 results, launch traces and power logs.
@@ -25,7 +27,7 @@ import pandas as pd
 
 from grind import gpu
 from runner import instances as inst
-from runner.configs import COMPRESSIONS, GATE, ROOT, from_shortlist, shortlist_sha256
+from runner.configs import COMPRESSIONS, EXTRA, GATE, ROOT, from_shortlist, shortlist_sha256
 from runner.power_logger import PowerLogger
 
 DATA = ROOT / "data"
@@ -81,15 +83,26 @@ def eta_s(cfg):
     return cfg.n * cfg.expected_tries() * COMPRESSIONS[cfg.kind] / RATE[cfg.kind]
 
 
-def plan(smoke):
-    cfgs = from_shortlist()
+def plan(smoke, extra=None, only=None, n=None):
+    if extra:
+        cfgs = EXTRA[extra]()  # sample counts set by the add-on itself
+    else:
+        cfgs = from_shortlist()
+        for c in cfgs:
+            if c.kind == "wots":
+                c.n = N_WOTS
+            elif c.kind in ("R", "ctr"):
+                c.n = N_FORS
+            else:
+                c.n = N_PORS_HEAVY if c.expected_tries() > 1e6 else N_PORS
+    if only:
+        missing = set(only) - {c.id for c in cfgs}
+        if missing:
+            raise SystemExit(f"unknown config ids: {sorted(missing)}")
+        cfgs = [c for c in cfgs if c.id in only]
     for c in cfgs:
-        if c.kind == "wots":
-            c.n = N_WOTS
-        elif c.kind in ("R", "ctr"):
-            c.n = N_FORS
-        else:
-            c.n = N_PORS_HEAVY if c.expected_tries() > 1e6 else N_PORS
+        if n:
+            c.n = n
         if smoke:
             c.n = max(c.n // 1000, 20)
     return sorted(cfgs, key=eta_s)
@@ -278,10 +291,15 @@ def main():
     ap.add_argument("--smoke", action="store_true", help="tiny sample counts, short E0/E5")
     ap.add_argument("--resume", metavar="RUN_ID", help="continue data/raw/<RUN_ID>, skipping finished parts")
     ap.add_argument("--skip", default="", help="comma list of E0,E1,E2,E3,E5 to skip")
+    ap.add_argument("--extra", choices=sorted(EXTRA), help="run an add-on config set instead of the shortlist")
+    ap.add_argument("--only", default="", help="comma list of config ids to run (others are left out)")
+    ap.add_argument("--n", type=int, help="override samples per config")
     args = ap.parse_args()
+    only = {s.strip() for s in args.only.split(",") if s.strip()}
     skip = {s.strip().upper() for s in args.skip.split(",") if s.strip()}
 
-    run_id = args.resume or (("smoke-" if args.smoke else "") + uuid.uuid4().hex[:12])
+    prefix = ("smoke-" if args.smoke else "") + (f"{args.extra}-" if args.extra else "") + ("rerun-" if only else "")
+    run_id = args.resume or (prefix + uuid.uuid4().hex[:12])
     out = DATA / "raw" / run_id
     if args.resume and not out.exists():
         raise SystemExit(f"no such run: {out}")
@@ -289,10 +307,13 @@ def main():
     log = Log(out / "log.txt")
     smoke = args.smoke or run_id.startswith("smoke-")
 
-    cfgs = plan(smoke)
+    extra = args.extra or next((e for e in EXTRA if run_id.removeprefix("smoke-").startswith(e + "-")), None)
+    cfgs = plan(smoke, extra, only, args.n)
     cfg_path = out / "configs.json"
-    if cfg_path.exists():  # resume: keep the sample counts the run started with
+    if cfg_path.exists():  # resume: same configs and sample counts the run started with
         stored = {d["config_id"]: d["n"] for d in json.loads(cfg_path.read_text())}
+        if args.resume:
+            cfgs = [c for c in plan(smoke, extra) if c.id in stored]
         for c in cfgs:
             c.n = stored.get(c.id, c.n)
     else:
@@ -302,7 +323,8 @@ def main():
             and not ({"E2"} if c.kind == "wots" else {"E3"}) & skip]
     log(f"run {run_id} ({'smoke' if smoke else 'full'}): {len(cfgs)} configs, {len(todo)} to do, "
         f"est. GPU time {sum(map(eta_s, todo)) / 3600:.2f} h (+E0/E1/E5)")
-    manifest("campaign_start", run_id, smoke=smoke, resumed=bool(args.resume), skip=sorted(skip))
+    manifest("campaign_start", run_id, smoke=smoke, resumed=bool(args.resume), skip=sorted(skip),
+             extra=args.extra, only=sorted(only), n_override=args.n)
     keep_awake()
 
     t0 = time.time()

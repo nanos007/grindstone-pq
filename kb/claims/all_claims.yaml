@@ -119,7 +119,8 @@ claims:
   value:
     formula: nu/(w^l*2^z_b)
   confidence: H
-  verified_by_us: false
+  verified_by_us: true
+  verified_by_us_evidence: 'run 196e7e91e907: tries geometric with analytic p in 37/37 configs (analysis/out/01_validate/validation.md, 02_tails/quantiles.md)'
   tags:
   - wots_c
   - model
@@ -139,7 +140,8 @@ claims:
     smoke_mean_16_240: 65.85
     smoke_n: 2000
   confidence: H
-  verified_by_us: false
+  verified_by_us: true
+  verified_by_us_evidence: 'run 196e7e91e907: measured means 65.65 / 1335.7 / 747.4 / 30064 (ratios 0.9996 / 1.0003 / 0.9992 / 0.9974)'
   tags:
   - wots_c
   - model
@@ -383,7 +385,8 @@ claims:
     wots_c: 1
     repo_model: 4
   confidence: H
-  verified_by_us: false
+  verified_by_us: true
+  verified_by_us_evidence: ref/fors_c.count_compressions (tests/test_fors_c.py::test_compressions_per_attempt); GPU attempt rates consistent (analysis/out/01_validate/layout_costs.md)
   tags:
   - cost_model
   - decision
@@ -492,7 +495,8 @@ claims:
     p_24_2_16_8: 1.0
     p_20_2_15_10: 0.99352
   confidence: M
-  verified_by_us: false
+  verified_by_us: true
+  verified_by_us_evidence: 'run 196e7e91e907: 17 PORS+FP configs match the P_enough-corrected analytic mean (max |dev| 1.66 %, within 2.4 sigma)'
   tags:
   - pors_fp
   - model
@@ -729,6 +733,8 @@ claims:
     repo_R_bytes: 16
     delta_bytes: 16
   confidence: H
+  verified_by_us: true
+  verified_by_us_evidence: tests/test_costs.py::test_headline_sizes_repo_head_is_16B_smaller
   agent: B
 - id: B-006
   statement: KN Tables 1-2 compression counts use the original 'uncached' convention (Th2 = 2 compressions); repo HEAD defaults
@@ -745,6 +751,8 @@ claims:
   exact_location: Tables 1-2; grindstone/tests/test_costs.py::test_paper_tables_full_row
   date: 2026-10-22
   confidence: H
+  verified_by_us: true
+  verified_by_us_evidence: tests/test_costs.py::test_paper_tables_full_row, test_paper_spx_baseline
   agent: B
 - id: B-008
   statement: WOTS+C success probability p = nu / w^len1 (times 2^-z_b), nu = sum_j (-1)^j C(l,j) C(S+l-jw-1, l-1); expected
@@ -753,6 +761,8 @@ claims:
   exact_location: Sec. 5.1, eq. (1); costs.sage:184-205, 409-411
   date: 2025-12-08
   confidence: H
+  verified_by_us: true
+  verified_by_us_evidence: 'run 196e7e91e907: 7 WOTS+C configs, mean and distribution match (analysis/out/01_validate/validation.md)'
   agent: B
 - id: B-009
   statement: 'WOTS+C expected tries per layer: w=16,len1=32: S=240 -> 65.7, S=304 -> 1335; w=256,len1=16: S=2040 -> 748, S=2840
@@ -767,6 +777,8 @@ claims:
     w256_S2040: 748
     w256_S2840: 30143
   confidence: H
+  verified_by_us: true
+  verified_by_us_evidence: 'run 196e7e91e907: measured means within 0.3 % of 65.7 / 1335 / 748 / 30143'
   agent: B
 - id: B-010
   statement: 'WOTS+C zero-chains: the last z chains are omitted (l = len1 - z) if their digits are 0; the paper writes the
@@ -803,6 +815,8 @@ claims:
     is sufficient'
   date: 2026-08-26
   confidence: H
+  verified_by_us: true
+  verified_by_us_evidence: 'run 196e7e91e907: PORS+FP means match 1/P(|S|<=m_max) after the P_enough correction (analysis/out/01_validate/validation.md)'
   agent: B
 - id: B-014
   statement: 'The analytic worst case is a combined count: worst_case(p_wots, 2^-30, d) [negative-binomial over all d layers]
@@ -2032,7 +2046,8 @@ claims:
     cps_typical: 1800000000.0
     cps_high: 2100000000.0
   confidence: L
-  verified_by_us: false
+  verified_by_us: true
+  verified_by_us_evidence: E0 measured 2.15e9 compressions/s sustained (slightly above the estimated 1.3-2.0e9 range)
   tags:
   - class3
   - derived
@@ -2049,7 +2064,8 @@ claims:
     cps_typical: 180000000.0
     cps_high: 230000000.0
   confidence: M
-  verified_by_us: false
+  verified_by_us: true
+  verified_by_us_evidence: E5 measured 2.33e8 compressions/s sustained, 12 threads (at the top of the estimated range)
   tags:
   - class2
   - derived
@@ -2106,6 +2122,7 @@ claims:
     general: 103+32m
   confidence: H
   verified_by_us: true
+  verified_by_us_evidence: tests/test_fees.py::test_bip360_reference_sizes
   tags:
   - p2mr
   - weight
@@ -2203,6 +2220,7 @@ claims:
     vsize: 182
   confidence: H
   verified_by_us: true
+  verified_by_us_evidence: tests/test_fees.py::test_mainnet_weight_matches_explorer
   tags:
   - sanity-check
   - p2tr
@@ -2219,6 +2237,7 @@ claims:
     vsize: 322
   confidence: H
   verified_by_us: true
+  verified_by_us_evidence: tests/test_fees.py::test_mainnet_weight_matches_explorer
   tags:
   - sanity-check
   - p2tr

@@ -28,6 +28,13 @@ def test_probabilities_sum_to_one():
 
 def test_digits_msb_first():
     assert wots_c.digits(bytes([0xAB, 0xCD]), 4, 4) == [0xA, 0xB, 0xC, 0xD]
+    assert wots_c.digits(bytes([0b11100100]), 2, 4) == [3, 2, 1, 0]  # w = 4 (OQ-3 sweep)
+
+
+def test_w4_probability_bruteforce():
+    w, len1, S = 4, 6, 9
+    hits = sum(sum((x >> (2 * i)) & 3 for i in range(len1)) == S for x in range(w ** len1))
+    assert wots_c.success_prob(wots_c.WotsParams(w, len1, S)) == pytest.approx(hits / w ** len1)
 
 
 @pytest.mark.parametrize("lay", [wots_c.WotsLayout(), wots_c.WotsLayout(ctr_le=True),
@@ -46,10 +53,11 @@ def test_template_matches_th(lay):
 cupy = pytest.importorskip("cupy")
 
 
-@pytest.mark.parametrize("lay", [wots_c.WotsLayout(), wots_c.WotsLayout(ctr_le=True)])
-def test_gpu_matches_reference(lay):
+@pytest.mark.parametrize("lay,p", [(wots_c.WotsLayout(), wots_c.WotsParams(w=16, len1=32, S=240, z_bits=2)),
+                                   (wots_c.WotsLayout(ctr_le=True), wots_c.WotsParams(w=16, len1=32, S=240, z_bits=2)),
+                                   (wots_c.WotsLayout(), wots_c.WotsParams(w=4, len1=64, S=100))])
+def test_gpu_matches_reference(lay, p):
     from grind import gpu
-    p = wots_c.WotsParams(w=16, len1=32, S=240, z_bits=2)
     mids, tm, refs = [], [], []
     for _ in range(64):
         seed, adrs, m = os.urandom(16), os.urandom(22), os.urandom(16)

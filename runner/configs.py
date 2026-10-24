@@ -96,10 +96,27 @@ def shortlist_sha256(path=SHORTLIST):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+# Add-on config sets, run as their own campaign with `--extra <name>` (not part of the shortlist).
+# oq3: WOTS+C "overgrinding" sweep for OQ-3 (larger S = more signer grinding, fewer verifier chain
+# steps, same size). w=4/len1=64 mirrors the Blockstream HW-wallet benchmark (S 96 -> 140); w=16 fills
+# in between the shortlist's S=240 and S=304. n: 1e6 up to E[tries] 1e5, then 1e5 (~15 min GPU total).
+def _oq3():
+    out = [Config("wots", w=4, S=S) for S in range(96, 141, 4)]
+    out += [Config("wots", w=16, S=S) for S in range(248, 304, 8)]
+    for c in out:
+        c.param_ids.append("oq3-sweep")
+        c.n = 1_000_000 if c.expected_tries() <= 1e5 else 100_000
+    return out
+
+
+EXTRA = {"oq3": _oq3}
+
+
 # E1: same kernels at reduced difficulty so the Python reference can check every counter.
-# Covers each acceptance path: WOTS+C w=16/256 and the zero mask, FORS+C masks inside one word
+# Covers each acceptance path: WOTS+C w=4/16/256 and the zero mask, FORS+C masks inside one word
 # and straddling words 3/4 (k=19, a=7: bits 126..132), PORS+FP with non-power-of-two t.
 GATE = [
+    Config("wots", w=4, S=100),     # OQ-3 sweep digit width
     Config("wots", w=16, S=240),
     Config("wots", w=256, S=2040),
     Config("wots", w=16, S=240, z=1),

@@ -21,7 +21,7 @@ meta:
   unit: sha256_compressions_per_second
   compiled: 2026-10-22
   agent: D
-  measured_values_present: false
+  measured_values_present: true   # class2/class3 'measured' blocks filled from run 196e7e91e907 (2026-10-24)
 
 classes:
 
@@ -141,10 +141,11 @@ classes:
     example_devices: ["Intel Core i5-13420H (our machine, 4P+4E, 45 W)", "i7-13700H", "i3-12100", "i9-11950H"]
     measured:
       device: "Intel Core i5-13420H, MSI Thin 15 B13VE (plan section 4.0)"
-      compressions_per_sec: null
-      watts: null
-      kind: measured_pending
+      compressions_per_sec: 2.328e+8   # E5, 12 threads, 120 s sustained (30 s burst: 2.539e+8; 1 thread: 2.933e+7)
+      watts: null                      # not measured; analysis uses 45 W PL1 as an estimate
+      kind: measured
       experiment: E5
+      run_id: 196e7e91e907
     cited_comparables:
       compressions_per_sec_per_core: {low: 1.25e+7, typical: 2.8e+7, high: 3.5e+7}
       notes: "low = OpenSSL one-shot API ~80 ns/block incl. call overhead (Ice Lake-SP); typical = wolfCrypt i9-11950H 1703 MiB/s; high = SUPERCOP Raptor Cove 2.05 c/B at 4.6 GHz."
@@ -174,10 +175,12 @@ classes:
     example_devices: ["RTX 4050 Laptop @ 45 W (our machine)", "RTX 4060", "RTX 4070", "RTX 4090"]
     measured:
       device: "NVIDIA RTX 4050 Laptop @ 45 W TGP (20 SM, max boost 1605 MHz)"
-      compressions_per_sec: null
-      watts: null
-      kind: measured_pending
+      compressions_per_sec: 2.151e+9   # E0, single-block SHA-256, median of last 2/3 of 600 s
+      watts: 44.9                      # nvidia-smi board power, mean of busy samples (> 30 W)
+      kind: measured
       experiment: E0
+      run_id: 196e7e91e907
+      note: "SM clock ~1975 MHz under load (above the 1605 MHz spec boost); power-capped at 45 W, not thermally throttled"
     estimate_rtx4050_laptop_45W:
       compressions_per_sec: {low: 1.3e+9, typical: 1.8e+9, high: 2.1e+9}
       kind: derived
